@@ -119,8 +119,11 @@ def example3_save_data():
     print(f"  采集时间 / Scraped at: {saved_data['scraped_at']}")
     
     # 清理示例文件 / Cleanup example file
-    os.remove(filepath)
-    print(f"\n✅ 示例文件已清理 / Example file cleaned up")
+    try:
+        os.remove(filepath)
+        print(f"\n✅ 示例文件已清理 / Example file cleaned up")
+    except (OSError, FileNotFoundError) as e:
+        print(f"\n⚠️  清理失败 / Cleanup failed: {e}")
 
 
 def example4_convenience_function():

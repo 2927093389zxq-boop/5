@@ -21,12 +21,14 @@ class TestAmazonScraper:
     
     def test_custom_data_dir(self):
         """测试自定义数据目录 / Test custom data directory"""
+        import shutil
         custom_dir = "data/test_amazon"
         scraper = AmazonScraper(data_dir=custom_dir)
         assert scraper.data_dir == custom_dir
         assert os.path.exists(custom_dir)
-        # Cleanup
-        os.rmdir(custom_dir)
+        # Cleanup - use rmtree to handle non-empty directories
+        if os.path.exists(custom_dir):
+            shutil.rmtree(custom_dir)
     
     def test_random_user_agent(self):
         """测试随机User-Agent / Test random User-Agent"""
@@ -109,8 +111,11 @@ class TestAmazonScraper:
         assert saved_data['items'][0]['asin'] == "TEST123"
         assert 'scraped_at' in saved_data
         
-        # Cleanup
-        os.remove(filepath)
+        # Cleanup - wrap in try-except for safety
+        try:
+            os.remove(filepath)
+        except (OSError, FileNotFoundError) as e:
+            pass  # Ignore cleanup errors in tests
     
     def test_selectors_config(self):
         """测试选择器配置 / Test selectors configuration"""
