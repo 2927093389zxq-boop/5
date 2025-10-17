@@ -128,40 +128,13 @@ def sidebar_navigation():
         telemetry.track_feature_usage(f"{main_menu}-{sub_menu}")
     return main_menu, sub_menu
 
-def route_intelligent_platform(sub_menu):
+def route_intelligent_platform_old(sub_menu):
     """
-    智能体平台路由调度。
+    智能体平台路由调度（旧版本，待删除）。
     """
-    if sub_menu == "主页":
-        render_dashboard()
-    elif sub_menu == "智能分析":
-        render_analytics()
-    elif sub_menu == "原型测试":
-        render_prototype()
-    elif sub_menu == "权威数据中心":
-        render_authoritative_data_center()
-    elif sub_menu == "数据来源追踪":
-        render_sources()
-    elif sub_menu == "YouTube":
-        from ui.youtube_enhanced import render_youtube_query
-        render_youtube_query()
-    elif sub_menu == "TikTok":
-        st.header("TikTok 趋势（占位）")
-        st.write("后续通过 API 管理模块添加真实数据接口。")
-    elif sub_menu == "Amazon采集工具":
-        # 延迟导入，避免初始加载开销
-        import ui.amazon_crawl_options
-    elif sub_menu == "AI迭代系统":
-        from ui.ai_iteration_system import render_ai_iteration_system
-        render_ai_iteration_system()
-    elif sub_menu == "API 管理":
-        render_api_admin()
-    elif sub_menu == "政策中心":
-        render_policy_center()
-    elif sub_menu == "系统概览":
-        render_system_overview()
-    elif sub_menu == "日志与设置":
-        render_log_and_settings()
+    # This function is deprecated and will be removed
+    pass
+
 
 
 def render_policy_center():
@@ -569,8 +542,8 @@ def route_intelligent_platform(sub_menu):
         from ui.youtube_enhanced import render_youtube_query
         render_youtube_query()
     elif sub_menu == "TikTok":
-        st.header("TikTok 趋势（占位）")
-        st.write("后续通过 API 管理模块添加真实数据接口。")
+        from ui.tiktok_enhanced import render_tiktok_module
+        render_tiktok_module()
     elif sub_menu == "Amazon采集工具":
         # 延迟导入，避免初始加载开销
         import ui.amazon_crawl_options
