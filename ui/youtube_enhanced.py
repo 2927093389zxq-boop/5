@@ -188,11 +188,23 @@ def render_youtube_query():
                                 output_dir = "data/youtube"
                                 os.makedirs(output_dir, exist_ok=True)
                                 
+                                # 清理channel_id以防止路径注入
+                                import re
+                                safe_channel_id = re.sub(r'[^a-zA-Z0-9_-]', '', channel_id)[:50]
+                                
                                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                                output_file = f"{output_dir}/channel_{channel_id}_{timestamp}.json"
+                                output_file = os.path.join(output_dir, f"channel_{safe_channel_id}_{timestamp}.json")
+                                
+                                # 确保输出路径在预期目录内
+                                output_file = os.path.abspath(output_file)
+                                expected_dir = os.path.abspath(output_dir)
+                                if not output_file.startswith(expected_dir):
+                                    st.error("安全错误: 无效的文件路径")
+                                    return
                                 
                                 full_results = {
-                                    "channel_id": channel_id,
+                                    "channel_id": safe_channel_id,
+                                    "original_channel_id": channel_id,
                                     "channel_stats": channel_stats,
                                     "videos_analyzed": len(video_analysis_results),
                                     "video_details": video_analysis_results,
