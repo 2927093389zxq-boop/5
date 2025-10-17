@@ -87,6 +87,8 @@ function validateAgainstSchema(data, schema) {
 
 /**
  * Anonymize sensitive field
+ * Uses SHA-256 with field-specific salt for anonymization
+ * Note: For production use with highly sensitive data, consider using bcrypt or PBKDF2
  */
 function anonymizeField(value, fieldName) {
   if (value === null || value === undefined) {
@@ -96,9 +98,13 @@ function anonymizeField(value, fieldName) {
   // Convert to string for hashing
   const strValue = String(value);
   
+  // Use a field-specific salt to prevent rainbow table attacks
+  // In production, use environment variable or secure key management
+  const salt = `ANON_SALT_${fieldName}_v1`;
+  
   // Create a hash-based anonymization
   const hash = createHash('sha256')
-    .update(strValue + fieldName)
+    .update(salt + strValue + fieldName)
     .digest('hex')
     .substring(0, 16);
   
@@ -169,6 +175,7 @@ async function processRawFile(filename, sourceConfig) {
     if (schema) {
       const errors = validateAgainstSchema(record, schema);
       if (errors.length > 0) {
+        console.log(`    ⚠ Record ${i} validation failed: ${errors[0]}`);
         validationErrors.push({ recordIndex: i, errors });
         continue; // Skip invalid records
       }

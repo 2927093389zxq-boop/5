@@ -42,7 +42,13 @@ async function generateSeedFile(processedFilename) {
   console.log(`  Found ${records.length} records`);
   
   // Extract source ID from filename (format: processed-{sourceId}-{timestamp}.json)
-  const sourceId = processedFilename.split('-')[1];
+  // Validate filename format
+  const filenameParts = processedFilename.split('-');
+  if (filenameParts.length < 3 || !processedFilename.startsWith('processed-')) {
+    throw new Error(`Invalid processed filename format: ${processedFilename}`);
+  }
+  
+  const sourceId = filenameParts[1];
   
   // Transform to seed format
   const seedRecords = transformToSeedFormat(records, sourceId);

@@ -9,6 +9,7 @@ import { readFile, writeFile, mkdir, rm } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createHash } from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -139,11 +140,10 @@ async function testAnonymization() {
       name: 'John Doe'
     };
     
-    // Simulate anonymization
-    const { createHash } = await import('crypto');
-    
+    // Simulate anonymization with salt
+    const salt = 'ANON_SALT_email_v1';
     const emailHash = createHash('sha256')
-      .update(testData.email + 'email')
+      .update(salt + testData.email + 'email')
       .digest('hex')
       .substring(0, 16);
     
