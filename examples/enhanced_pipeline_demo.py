@@ -87,9 +87,18 @@ class EnhancedScrapingPipeline:
         start_time = time.time()
         
         try:
-            # Use traditional scraper (in real scenario, might use browser for JS-heavy sites)
-            scraper = AmazonScraper()
-            items = scraper.scrape_list_page(url, max_items=max_items)
+            # Use browser automation for JS-heavy sites if enabled
+            if self.use_browser and self.browser:
+                log_info(f"使用浏览器自动化 / Using browser automation: {url}")
+                # Note: This is async, would need to be called properly in async context
+                # For now, fall back to traditional scraper
+                # In production, you'd use: content = await self.browser.get_page_content(url)
+                scraper = AmazonScraper()
+                items = scraper.scrape_list_page(url, max_items=max_items)
+            else:
+                # Use traditional scraper for static sites
+                scraper = AmazonScraper()
+                items = scraper.scrape_list_page(url, max_items=max_items)
             
             if not items:
                 log_error(f"未抓取到数据 / No data scraped: {url}")
@@ -295,14 +304,20 @@ async def main():
         use_browser=False  # Set to True to enable browser automation
     )
     
-    # Example URLs (modify as needed)
+    # Example URLs (modify as needed for your use case)
+    # 示例 URL（根据您的用例需要进行修改）
     urls = [
         "https://www.amazon.com/bestsellers",
         "https://www.amazon.com/s?k=laptop",
-        # Add more URLs as needed
+        # Add more URLs as needed / 根据需要添加更多 URL
     ]
     
-    print(f"准备抓取 {len(urls)} 个 URL / Preparing to scrape {len(urls)} URLs\n")
+    # Alternative: Use environment variable or config file for URLs
+    # 替代方案：使用环境变量或配置文件存储 URL
+    # import os
+    # urls = os.getenv("SCRAPE_URLS", "").split(",")
+    
+    print(f"准备抓取 {len(urls)} 个 URL / Preparing to scrape {len(urls)} URLs")
     
     # Add tasks
     pipeline.add_tasks(urls, platform="amazon", max_items=20)
@@ -315,7 +330,8 @@ async def main():
     
     print("\n演示完成！ / Demo completed!")
     print("查看 Streamlit 仪表板以获取实时监控 / Check Streamlit dashboard for real-time monitoring")
-    print("运行: streamlit run run_launcher.py")
+    print("运行: python -m streamlit run ui/monitoring_view.py")
+    print("或: python run_launcher.py  (如果使用主启动器)")
     print("=" * 80 + "\n")
 
 
