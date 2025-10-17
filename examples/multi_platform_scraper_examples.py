@@ -106,9 +106,17 @@ def example_4_batch_scraping():
             print(f"\n正在采集 {platform} / Scraping {platform}...")
             scraper = get_scraper(platform)
             
-            # 注意：这里使用空URL仅作演示，实际使用时需要提供有效URL
-            # Note: Using empty URL for demo only, provide valid URL in actual use
-            products = []  # 跳过实际采集 / Skip actual scraping
+            # 注意：实际使用时需要提供有效URL并设置enable_scraping=True
+            # Note: Provide valid URL and set enable_scraping=True for actual use
+            enable_scraping = False  # 设为True以启用实际采集 / Set to True to enable actual scraping
+            
+            if enable_scraping:
+                # 实际采集代码 / Actual scraping code
+                url = f"https://{platform}.com/search?q=example"
+                products = scraper.run(url, max_items=10)
+            else:
+                # 演示模式：跳过实际网络请求 / Demo mode: skip actual network requests
+                products = []
             
             print(f"  {platform}: 采集到 {len(products)} 个商品")
             all_products.extend(products)
@@ -117,6 +125,8 @@ def example_4_batch_scraping():
             print(f"  {platform}: 失败 - {e}")
     
     print(f"\n总计采集: {len(all_products)} 个商品 / Total scraped: {len(all_products)} products")
+    print("\n提示: 设置 enable_scraping=True 以启用实际采集")
+    print("Tip: Set enable_scraping=True to enable actual scraping")
 
 
 def example_5_list_all_platforms():

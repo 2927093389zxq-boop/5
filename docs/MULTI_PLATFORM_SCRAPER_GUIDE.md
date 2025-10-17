@@ -39,6 +39,9 @@ This system now supports data collection from 28 major e-commerce platforms with
 28. **Lazada** - 东南亚电商平台
 29. **Temu** - 拼多多海外版
 
+**注意：** Amazon平台使用独立的高级爬虫实现，其他28个平台使用统一的多平台爬虫框架。
+**Note:** Amazon uses a standalone advanced scraper implementation, while the other 28 platforms use the unified multi-platform scraper framework.
+
 ## 快速开始 / Quick Start
 
 ### 方式1: Python代码 / Method 1: Python Code
