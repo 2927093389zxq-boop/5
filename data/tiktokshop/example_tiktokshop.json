@@ -1,0 +1,17 @@
+{
+  "platform": "tiktokshop",
+  "items": [
+    {
+      "platform": "tiktokshop",
+      "title": "Test Product 1",
+      "price": "$19.99"
+    },
+    {
+      "platform": "tiktokshop",
+      "title": "Test Product 2",
+      "price": "$29.99"
+    }
+  ],
+  "total_count": 2,
+  "scraped_at": "2025-10-17T19:20:38.790328+00:00"
+}
