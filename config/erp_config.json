@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "inventory_settings": {
+    "default_reorder_point": 10,
+    "enable_auto_purchase": true,
+    "low_stock_threshold_percent": 20,
+    "stock_count_schedule": "monthly"
+  },
+  "supplier_settings": {
+    "default_payment_terms": "net_30",
+    "enable_auto_reorder": true,
+    "supplier_rating_enabled": true
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "features": [
+    {
+      "name": "basic_analytics",
+      "label": "基础分析",
+      "description": "基础的数据分析功能",
+      "plans": ["free", "basic", "professional", "enterprise"]
+    },
+    {
+      "name": "advanced_analytics",
+      "label": "高级分析",
+      "description": "高级数据分析和可视化",
+      "plans": ["basic", "professional", "enterprise"]
+    },
+    {
+      "name": "ai_recommendation",
+      "label": "AI推荐",
+      "description": "基于AI的营销推荐",
+      "plans": ["professional", "enterprise"]
+    },
+    {
+      "name": "api_access",
+      "label": "API访问",
+      "description": "API接口访问",
+      "plans": ["professional", "enterprise"]
+    },
+    {
+      "name": "custom_integration",
+      "label": "自定义集成",
+      "description": "与其他系统的自定义集成",
+      "plans": ["enterprise"]
+    }
+  ]
+}

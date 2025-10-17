@@ -1,0 +1,4 @@
+2025-10-17 22:31:27,950 INFO scraper [Scheduler] 已启动
+2025-10-17 22:32:07,231 INFO scraper [PROXY] 无可用代理，使用直连
+2025-10-17 22:32:07,231 INFO scraper [INIT] URL=https://www.amazon.com/bestsellers proxy=None ua=Mozilla/5.0 (Macintosh; Intel Mac OS X 13_2_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15 scraped=0
+2025-10-17 22:42:29,026 INFO scraper [Scheduler] 已启动

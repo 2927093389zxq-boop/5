@@ -1,0 +1,5 @@
+low_yield_files_scanned_min: 5
+low_yield_avg_items_max: 3
+too_many_zeros_pages_zero_min: 2
+captcha_hits_min: 0
+errors_total_min: 5

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LicenseData",
+  "type": "object",
+  "required": ["data", "signature"],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "license_id",
+        "user_id",
+        "name",
+        "email",
+        "issued_at",
+        "expires_at",
+        "feature_set",
+        "issued_by",
+        "telemetry_enabled"
+      ],
+      "properties": {
+        "schema_version": { "type": "integer" },
+        "license_id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "issued_at": { "type": "string" },
+        "expires_at": { "type": "string" },
+        "feature_set": { "type": "string" },
+        "issued_by": { "type": "string" },
+        "telemetry_enabled": { "type": "boolean" }
+      }
+    },
+    "signature": { "type": "string" }
+  }
+}

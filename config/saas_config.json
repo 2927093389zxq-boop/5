@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "platforms": [
+    {
+      "name": "Amazon",
+      "api_version": "v2",
+      "require_mws": true,
+      "auth_fields": [
+        "seller_id",
+        "auth_token",
+        "access_key",
+        "secret_key"
+      ],
+      "features": [
+        "listings",
+        "orders",
+        "reports",
+        "inventory"
+      ]
+    },
+    {
+      "name": "Shopify",
+      "api_version": "2023-07",
+      "require_mws": false,
+      "auth_fields": [
+        "shop_url",
+        "api_key",
+        "api_password",
+        "access_token"
+      ],
+      "features": [
+        "products",
+        "orders",
+        "customers",
+        "inventory"
+      ]
+    }
+  ],
+  "sync_settings": {
+    "auto_sync_interval_minutes": 60,
+    "retry_failed_sync_count": 3,
+    "max_products_per_sync": 100
+  }
+}
