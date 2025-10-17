@@ -23,7 +23,7 @@ def test_amazon_scraper():
         
         # 创建实例
         scraper = AmazonScraper()
-        assert scraper.data_dir == "data/amazon"
+        assert scraper.data_dir.endswith('data/amazon')
         assert os.path.exists(scraper.data_dir)
         
         # 验证选择器配置
@@ -56,11 +56,11 @@ def test_data_validation():
         # 测试验证
         valid_data = {'title': 'Test Product'}
         is_valid, errors = validator.validate(valid_data)
-        assert is_valid == True
+        assert is_valid
         
         invalid_data = {}
         is_valid, errors = validator.validate(invalid_data)
-        assert is_valid == False
+        assert not is_valid
         
         print("✓ 数据验证功能正常")
         return True

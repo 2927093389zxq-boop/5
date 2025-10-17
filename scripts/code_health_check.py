@@ -21,6 +21,9 @@ sys.path.insert(0, str(project_root))
 class HealthChecker:
     """代码健康检查器 / Code Health Checker"""
     
+    # 错误消息最大长度 / Maximum length for error messages
+    ERROR_MESSAGE_MAX_LENGTH = 80
+    
     def __init__(self):
         self.results = {
             'passed': [],
@@ -36,7 +39,8 @@ class HealthChecker:
         
         core_modules = [
             'logging_setup',
-            # 'scheduler',  # Skipping - starts automatically on import
+            # 'scheduler',  # 跳过: 导入时会自动启动后台调度器，可能导致测试阻塞
+            #                Skipped: Automatically starts background scheduler on import, may block tests
             'scheduler_batch',
             'scrapers.amazon_scraper',
             'scrapers.multi_platform_scraper',
@@ -64,7 +68,8 @@ class HealthChecker:
             'core.ai.evolution_engine',
             'core.ai.auto_patch',
             'core.ai.memory_manager',
-            # 'core.ai.scheduler',  # Skipping - starts automatically on import
+            # 'core.ai.scheduler',  # 跳过: 导入时会自动启动AI学习调度器，可能导致测试阻塞
+            #                        Skipped: Automatically starts AI learning scheduler on import, may block tests
             'publishers.mail_sender',
         ]
         
@@ -75,7 +80,7 @@ class HealthChecker:
                 print(f"✓ {module_name}")
             except Exception as e:
                 self.results['failed'].append(f"✗ 模块导入失败: {module_name} - {str(e)}")
-                print(f"✗ {module_name}: {str(e)[:80]}")
+                print(f"✗ {module_name}: {str(e)[:self.ERROR_MESSAGE_MAX_LENGTH]}")
     
     def check_ui_modules(self):
         """检查UI模块 / Check UI modules"""
@@ -103,7 +108,7 @@ class HealthChecker:
                 print(f"✓ {module_name}")
             except Exception as e:
                 self.results['failed'].append(f"✗ UI模块导入失败: {module_name} - {str(e)}")
-                print(f"✗ {module_name}: {str(e)[:80]}")
+                print(f"✗ {module_name}: {str(e)[:self.ERROR_MESSAGE_MAX_LENGTH]}")
     
     def check_directories(self):
         """检查必需目录 / Check required directories"""
@@ -198,7 +203,7 @@ class HealthChecker:
                 print(f"✓ {example}.py")
             except Exception as e:
                 self.results['failed'].append(f"✗ 示例脚本导入失败: {example}.py - {str(e)}")
-                print(f"✗ {example}.py: {str(e)[:80]}")
+                print(f"✗ {example}.py: {str(e)[:self.ERROR_MESSAGE_MAX_LENGTH]}")
     
     def print_summary(self):
         """打印总结 / Print summary"""
