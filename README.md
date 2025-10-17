@@ -60,6 +60,30 @@ weights:
 - 可在许可证上传时关闭或启用
 - 特征使用短窗口去重与可选匿名化
 
+## 数据管道 (Data Pipeline)
+自动化数据获取、验证、匿名化和种子生成流程：
+- 多源数据获取：REST API、文件、手动导入
+- JSON Schema 验证
+- 字段级匿名化（邮箱、电话等）
+- 种子数据生成与血缘追踪
+- CI 集成与自动化测试
+
+详细文档：
+- 快速开始：[QUICKSTART.md](QUICKSTART.md)
+- 完整文档：[data/README.md](data/README.md)
+
+基本使用：
+```bash
+# 获取数据
+node scripts/fetch_source.mjs
+
+# 处理与验证
+node scripts/process_data.mjs
+
+# 生成种子文件
+node scripts/generate_seeds.mjs
+```
+
 ## 调度
 `scheduler.py` 使用 APScheduler：
 - 市场采集：interval

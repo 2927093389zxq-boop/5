@@ -1,0 +1,20 @@
+# Ignore raw data files (may contain sensitive/PII data)
+raw/*.json
+raw/*.csv
+
+# Ignore processed data files
+processed/*.json
+processed/*.csv
+
+# Keep seed files under version control
+# seeds/ can be committed as they should be anonymized
+
+# Ignore temporary test data
+test_tmp/
+
+# Keep metadata for auditing
+# metadata/ should be committed for lineage tracking
+
+# Keep example/template files
+!raw/.gitkeep
+!processed/.gitkeep
