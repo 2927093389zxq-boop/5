@@ -49,10 +49,58 @@ def _fetch_amazon_data(
     deep_detail: bool
 ) -> List[Dict[str, Any]]:
     """Amazon平台数据获取 / Amazon platform data fetching"""
-    # 模拟数据 - 实际应用中应连接真实API或爬虫
-    # Mock data - should connect to real API or scraper in production
-    st.info("正在从Amazon获取数据... / Fetching data from Amazon...")
-    time.sleep(0.5)  # 模拟网络延迟 / Simulate network delay
+    try:
+        from scrapers.amazon_scraper import AmazonScraper
+        
+        st.info("正在从Amazon获取数据... / Fetching data from Amazon...")
+        
+        # 构建URL / Build URL
+        if category_url:
+            url = category_url
+        elif keyword:
+            url = f"https://www.amazon.com/s?k={keyword.replace(' ', '+')}"
+        else:
+            url = "https://www.amazon.com/bestsellers"
+        
+        # 使用真实爬虫 / Use real scraper
+        scraper = AmazonScraper()
+        products = scraper.run(url, max_items=max_items, deep_detail=deep_detail)
+        
+        # 转换为统一格式 / Convert to unified format
+        result = []
+        for product in products:
+            item = {
+                "platform": "Amazon",
+                "title": product.get("title", ""),
+                "price": product.get("price", ""),
+                "rating": product.get("rating", ""),
+                "url": product.get("url", ""),
+                "asin": product.get("asin", ""),
+                "review_count": product.get("review_count", ""),
+                "scraped_at": product.get("scraped_at", "")
+            }
+            if deep_detail and "description" in product:
+                item["description"] = product.get("description", "")
+                item["brand"] = product.get("brand", "")
+            result.append(item)
+        
+        return result
+        
+    except Exception as e:
+        st.error(f"Amazon数据获取失败 / Amazon data fetch failed: {e}")
+        # 降级为模拟数据 / Fallback to mock data
+        st.warning("使用模拟数据 / Using mock data")
+        return _fetch_amazon_mock_data(keyword, category_url, max_items, deep_detail)
+
+
+def _fetch_amazon_mock_data(
+    keyword: str,
+    category_url: str,
+    max_items: int,
+    deep_detail: bool
+) -> List[Dict[str, Any]]:
+    """Amazon模拟数据(降级方案) / Amazon mock data (fallback)"""
+    time.sleep(0.5)
     
     mock_data = []
     for i in range(min(max_items, 10)):

@@ -53,21 +53,37 @@ def _crawl_url(url: str, storage_mode: str) -> bool:
     Returns:
         是否成功 / Success status
     """
-    # 模拟实现 - 实际应该调用真实爬虫
-    # Mock implementation - should call real crawler
-    
-    # 根据存储模式保存数据 / Save data based on storage mode
-    if storage_mode == "local":
-        # 保存到本地文件 / Save to local file
-        pass
-    elif storage_mode == "mongo":
-        # 保存到MongoDB / Save to MongoDB
-        pass
-    elif storage_mode == "mysql":
-        # 保存到MySQL / Save to MySQL
-        pass
-    elif storage_mode == "cloud":
-        # 保存到云端 / Save to cloud
-        pass
-    
-    return True
+    try:
+        from scrapers.amazon_scraper import AmazonScraper
+        
+        # 使用真实爬虫 / Use real scraper
+        scraper = AmazonScraper()
+        products = scraper.scrape_list_page(url, max_items=50)
+        
+        if not products:
+            log_error(f"未采集到数据 / No data scraped: {url}")
+            return False
+        
+        # 根据存储模式保存数据 / Save data based on storage mode
+        if storage_mode == "local":
+            # 保存到本地文件 / Save to local file
+            scraper.save_data(products)
+            log_info(f"数据已保存到本地 / Data saved locally: {len(products)} items")
+        elif storage_mode == "mongo":
+            # 保存到MongoDB / Save to MongoDB
+            log_info("MongoDB存储暂未实现 / MongoDB storage not implemented yet")
+            # TODO: 实现MongoDB存储逻辑
+        elif storage_mode == "mysql":
+            # 保存到MySQL / Save to MySQL
+            log_info("MySQL存储暂未实现 / MySQL storage not implemented yet")
+            # TODO: 实现MySQL存储逻辑
+        elif storage_mode == "cloud":
+            # 保存到云端 / Save to cloud
+            log_info("云端存储暂未实现 / Cloud storage not implemented yet")
+            # TODO: 实现云端存储逻辑
+        
+        return True
+        
+    except Exception as e:
+        log_error(f"[ERROR] 爬取失败 / Crawl failed: {url} - {e}")
+        return False
