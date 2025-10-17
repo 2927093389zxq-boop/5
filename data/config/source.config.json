@@ -1,0 +1,64 @@
+{
+  "sources": [
+    {
+      "id": "example-api",
+      "type": "REST_API",
+      "name": "Example REST API Data Source",
+      "enabled": true,
+      "config": {
+        "baseUrl": "https://example.com/api",
+        "endpoints": [
+          {
+            "name": "records",
+            "path": "/records",
+            "method": "GET",
+            "pagination": {
+              "type": "offset",
+              "pageParam": "page",
+              "limitParam": "limit",
+              "defaultLimit": 100,
+              "maxPages": 10
+            }
+          }
+        ],
+        "headers": {
+          "Accept": "application/json",
+          "User-Agent": "DataPipeline/1.0"
+        },
+        "rateLimit": {
+          "requestsPerSecond": 2,
+          "retryAttempts": 3,
+          "retryDelay": 1000
+        }
+      },
+      "anonymization": {
+        "enabled": true,
+        "fields": ["email", "phone", "address", "ssn"]
+      },
+      "schemaValidation": {
+        "enabled": true,
+        "schemaFile": "records_schema.json"
+      }
+    },
+    {
+      "id": "file-import",
+      "type": "FILE",
+      "name": "File Import Source",
+      "enabled": false,
+      "config": {
+        "path": "./data/raw/import",
+        "format": "json",
+        "pattern": "*.json"
+      }
+    },
+    {
+      "id": "manual-import",
+      "type": "MANUAL",
+      "name": "Manual Data Import",
+      "enabled": false,
+      "config": {
+        "targetDirectory": "./data/raw/manual"
+      }
+    }
+  ]
+}
