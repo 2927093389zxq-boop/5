@@ -71,3 +71,10 @@ license.json
 # Development
 .dev
 checkpoint/
+
+# Scraper data and logs
+data/amazon/
+data/tiktokshop/
+data/*/
+scraper.log
+*.log
