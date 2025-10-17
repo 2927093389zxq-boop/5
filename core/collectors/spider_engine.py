@@ -2,10 +2,13 @@
 Spider engine stub for data collection.
 """
 
+from typing import List
+
+
 class SpiderEngine:
     """Simple spider engine for collecting data from URLs."""
     
-    def collect(self, urls):
+    def collect(self, urls: List[str]) -> List[str]:
         """
         Collect data from URLs.
         

@@ -2,7 +2,10 @@
 AI recommendation system stub.
 """
 
-def ai_recommendation(data):
+from typing import Any
+
+
+def ai_recommendation(data: Any) -> str:
     """
     Generate AI recommendations based on data.
     
