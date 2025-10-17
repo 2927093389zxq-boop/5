@@ -213,8 +213,14 @@ def render_self_iteration():
             
             if os.path.exists(log_file):
                 try:
+                    # 使用更高效的方式读取文件末尾
                     with open(log_file, 'r', encoding='utf-8') as f:
-                        lines = f.readlines()
+                        # 只读取最后100行以提高性能
+                        lines = []
+                        for line in f:
+                            lines.append(line)
+                            if len(lines) > 100:
+                                lines.pop(0)
                     
                     st.metric("总迭代次数", len(lines))
                     
@@ -229,7 +235,8 @@ def render_self_iteration():
                             
                             with st.expander(f"🔄 {timestamp[:19]} - {status}"):
                                 st.json(record)
-                        except:
+                        except (json.JSONDecodeError, Exception) as e:
+                            logger.warning(f"Failed to parse iteration record: {e}")
                             continue
                             
                 except Exception as e:

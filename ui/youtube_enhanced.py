@@ -339,6 +339,9 @@ def get_video_statistics(video_id: str) -> Dict[str, Any]:
         return {}
 
 
+# Constants for better maintenance
+TRANSCRIPT_INSTALL_MESSAGE = "安装 youtube-transcript-api 以启用自动文本提取: pip install youtube-transcript-api"
+
 def get_video_transcript(video_id: str) -> Dict[str, Any]:
     """
     提取视频文本（使用youtube-transcript-api或yt-dlp）
@@ -364,27 +367,48 @@ def get_video_transcript(video_id: str) -> Dict[str, Any]:
         except ImportError:
             # 如果youtube-transcript-api未安装，尝试使用yt-dlp
             import subprocess
+            import re
             
-            # 使用yt-dlp获取字幕
-            result = subprocess.run(
-                ['yt-dlp', '--skip-download', '--write-auto-sub', '--sub-lang', 'en', '--sub-format', 'vtt', 
-                 f'https://www.youtube.com/watch?v={video_id}'],
-                capture_output=True,
-                text=True
-            )
-            
-            if result.returncode == 0:
-                # 解析VTT文件
+            # 验证video_id格式（只允许字母数字和-_字符）
+            if not re.match(r'^[a-zA-Z0-9_-]+$', video_id):
                 return {
                     'video_id': video_id,
-                    'text': '字幕提取需要安装youtube-transcript-api: pip install youtube-transcript-api',
-                    'source': 'yt-dlp',
-                    'error': 'Manual VTT parsing required'
+                    'error': 'Invalid video ID format'
                 }
-            else:
+            
+            # 使用yt-dlp获取字幕（安全的方式）
+            try:
+                result = subprocess.run(
+                    ['yt-dlp', '--skip-download', '--write-auto-sub', '--sub-lang', 'en', '--sub-format', 'vtt', 
+                     f'https://www.youtube.com/watch?v={video_id}'],
+                    capture_output=True,
+                    text=True,
+                    timeout=30  # 添加超时限制
+                )
+                
+                if result.returncode == 0:
+                    # 解析VTT文件
+                    return {
+                        'video_id': video_id,
+                        'text': '字幕提取需要安装youtube-transcript-api: pip install youtube-transcript-api',
+                        'source': 'yt-dlp',
+                        'error': 'Manual VTT parsing required'
+                    }
+                else:
+                    return {
+                        'video_id': video_id,
+                        'error': 'No transcript available or tools not installed'
+                    }
+            except subprocess.TimeoutExpired:
                 return {
                     'video_id': video_id,
-                    'error': 'No transcript available or tools not installed'
+                    'error': 'Transcript extraction timed out'
+                }
+            except FileNotFoundError:
+                return {
+                    'video_id': video_id,
+                    'error': 'yt-dlp not installed',
+                    'note': TRANSCRIPT_INSTALL_MESSAGE
                 }
                 
     except Exception as e:
@@ -392,7 +416,7 @@ def get_video_transcript(video_id: str) -> Dict[str, Any]:
         return {
             'video_id': video_id,
             'error': str(e),
-            'note': '安装 youtube-transcript-api 以启用自动文本提取: pip install youtube-transcript-api'
+            'note': TRANSCRIPT_INSTALL_MESSAGE
         }
 
 
