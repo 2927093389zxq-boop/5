@@ -203,3 +203,4 @@ NotImplementedError
 2025-10-17 17:48:28,480 - scrapers - INFO - 数据已保存 / Data saved: data/amazon/example_products.json
 2025-10-17 17:52:36,607 - scrapers - INFO - 数据已保存 / Data saved: data/amazon/example_products.json
 2025-10-17 19:13:08,867 - scrapers - INFO - [tiktokshop] 数据已保存 / Data saved: data/tiktokshop/example_tiktokshop.json
+2025-10-17 19:16:55,616 - scrapers - INFO - [tiktokshop] 数据已保存 / Data saved: data/tiktokshop/example_tiktokshop.json
