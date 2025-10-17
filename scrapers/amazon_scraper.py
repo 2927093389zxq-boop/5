@@ -276,8 +276,8 @@ class AmazonScraper:
     
     def scrape_product_detail(self, asin: str) -> Dict[str, Any]:
         """
-        采集商品详情
-        Scrape product detail
+        采集商品详情 - 增强版包含更多字段
+        Scrape product detail - Enhanced version with more fields
         
         Args:
             asin: 商品ASIN / Product ASIN
@@ -304,36 +304,171 @@ class AmazonScraper:
             if title_elem:
                 detail['title'] = title_elem.get_text(strip=True)
             
-            # 提取价格 / Extract price
+            # 提取品牌 / Extract brand
+            brand_elem = soup.select_one('a#bylineInfo')
+            if brand_elem:
+                detail['brand'] = brand_elem.get_text(strip=True).replace('Visit the', '').replace('Store', '').strip()
+            
+            # 提取当前售价和原价 / Extract current price and original price
             price_elem = soup.select_one('span.a-price span.a-offscreen')
             if price_elem:
-                detail['price'] = price_elem.get_text(strip=True)
+                detail['current_price'] = price_elem.get_text(strip=True)
+            
+            # 提取原价（未打折前）/ Extract original price (before discount)
+            list_price_elem = soup.select_one('span.a-price.a-text-price span.a-offscreen')
+            if list_price_elem:
+                detail['original_price'] = list_price_elem.get_text(strip=True)
+            
+            # 提取折扣信息 / Extract discount info
+            discount_elem = soup.select_one('span.savingsPercentage')
+            if discount_elem:
+                detail['discount_percentage'] = discount_elem.get_text(strip=True)
             
             # 提取评分 / Extract rating
             rating_elem = soup.select_one('span.a-icon-alt')
             if rating_elem:
-                detail['rating'] = rating_elem.get_text(strip=True)
+                detail['average_rating'] = rating_elem.get_text(strip=True)
             
             # 提取评论数 / Extract review count
             review_elem = soup.select_one('span#acrCustomerReviewText')
             if review_elem:
                 detail['review_count'] = review_elem.get_text(strip=True)
             
-            # 提取描述 / Extract description
+            # 提取产品描述（短/长）/ Extract product description (short/long)
             desc_elem = soup.select_one('div#feature-bullets')
             if desc_elem:
                 bullets = desc_elem.select('span.a-list-item')
-                detail['description'] = [b.get_text(strip=True) for b in bullets]
+                detail['short_description'] = [b.get_text(strip=True) for b in bullets if b.get_text(strip=True)]
             
-            # 提取品牌 / Extract brand
-            brand_elem = soup.select_one('a#bylineInfo')
-            if brand_elem:
-                detail['brand'] = brand_elem.get_text(strip=True)
+            # 提取详细描述 / Extract detailed description
+            long_desc_elem = soup.select_one('div#productDescription')
+            if long_desc_elem:
+                detail['long_description'] = long_desc_elem.get_text(strip=True)[:500]
+            
+            # 提取规格参数（尺寸、颜色、重量等）/ Extract specifications
+            detail['specifications'] = {}
+            spec_tables = soup.select('table.prodDetTable, div#prodDetails table')
+            for table in spec_tables:
+                rows = table.select('tr')
+                for row in rows:
+                    cells = row.select('th, td')
+                    if len(cells) >= 2:
+                        key = cells[0].get_text(strip=True)
+                        value = cells[1].get_text(strip=True)
+                        if key and value:
+                            detail['specifications'][key] = value
+            
+            # 提取BSR排名 / Extract BSR ranking
+            bsr_elem = soup.select_one('div#detailBulletsWrapper_feature_div')
+            if bsr_elem:
+                bsr_text = bsr_elem.get_text()
+                if 'Best Sellers Rank' in bsr_text or 'BSR' in bsr_text:
+                    detail['bsr_ranking'] = bsr_text[bsr_text.find('Best Sellers Rank'):bsr_text.find('Best Sellers Rank')+200].strip()
+            
+            # 提取首次上架时间 / Extract first available date
+            date_elem = soup.select_one('div#detailBulletsWrapper_feature_div')
+            if date_elem:
+                date_text = date_elem.get_text()
+                if 'Date First Available' in date_text:
+                    start = date_text.find('Date First Available')
+                    detail['first_available_date'] = date_text[start:start+100].replace('Date First Available', '').strip()[:50]
+            
+            # 提取库存状态 / Extract stock status
+            stock_elem = soup.select_one('div#availability span')
+            if stock_elem:
+                detail['stock_status'] = stock_elem.get_text(strip=True)
+            
+            # 提取卖家信息 / Extract seller info
+            seller_elem = soup.select_one('div#merchant-info')
+            if seller_elem:
+                detail['seller_name'] = seller_elem.get_text(strip=True)
+            
+            # 提取FBA信息 / Extract FBA info
+            fba_elem = soup.select_one('span:contains("Fulfilled by Amazon")')
+            detail['is_fba'] = bool(fba_elem)
+            
+            # 提取配送信息 / Extract shipping info
+            shipping_elem = soup.select_one('div#mir-layout-DELIVERY_BLOCK')
+            if shipping_elem:
+                detail['shipping_info'] = shipping_elem.get_text(strip=True)[:200]
             
         except Exception as e:
             log_error(f"[EXCEPTION] 提取详情失败 / Failed to extract detail: {e}")
         
         return detail
+    
+    def scrape_product_reviews(self, asin: str, max_reviews: int = 10) -> List[Dict[str, Any]]:
+        """
+        采集商品评论
+        Scrape product reviews
+        
+        Args:
+            asin: 商品ASIN / Product ASIN
+            max_reviews: 最大评论数 / Maximum reviews
+            
+        Returns:
+            评论列表 / Review list
+        """
+        url = f"https://www.amazon.com/product-reviews/{asin}"
+        log_info(f"开始采集商品评论 / Starting review scraping: {asin}")
+        
+        soup = self._fetch_page(url)
+        if not soup:
+            return []
+        
+        reviews = []
+        review_elements = soup.select('div[data-hook="review"]')
+        
+        for review_elem in review_elements[:max_reviews]:
+            try:
+                review = {
+                    "asin": asin,
+                    "scraped_at": datetime.now(timezone.utc).isoformat()
+                }
+                
+                # 评论人昵称 / Reviewer nickname
+                name_elem = review_elem.select_one('span.a-profile-name')
+                if name_elem:
+                    review['reviewer_name'] = name_elem.get_text(strip=True)
+                
+                # 评论星级 / Review rating
+                rating_elem = review_elem.select_one('i[data-hook="review-star-rating"] span')
+                if rating_elem:
+                    review['rating'] = rating_elem.get_text(strip=True)
+                
+                # 评论发布日期 / Review date
+                date_elem = review_elem.select_one('span[data-hook="review-date"]')
+                if date_elem:
+                    review['review_date'] = date_elem.get_text(strip=True)
+                
+                # 评论标题 / Review title
+                title_elem = review_elem.select_one('a[data-hook="review-title"] span')
+                if title_elem:
+                    review['review_title'] = title_elem.get_text(strip=True)
+                
+                # 评论正文 / Review content
+                content_elem = review_elem.select_one('span[data-hook="review-body"] span')
+                if content_elem:
+                    review['review_content'] = content_elem.get_text(strip=True)
+                
+                # 评论图片 / Review images
+                image_elems = review_elem.select('img[data-hook="review-image-tile"]')
+                if image_elems:
+                    review['review_images'] = [img.get('src', '') for img in image_elems]
+                
+                # 有用投票数 / Helpful votes
+                helpful_elem = review_elem.select_one('span[data-hook="helpful-vote-statement"]')
+                if helpful_elem:
+                    review['helpful_votes'] = helpful_elem.get_text(strip=True)
+                
+                reviews.append(review)
+                
+            except Exception as e:
+                log_error(f"[ERROR] 提取评论失败 / Failed to extract review: {e}")
+                continue
+        
+        log_info(f"评论采集完成，共 {len(reviews)} 条 / Review scraping completed, {len(reviews)} reviews")
+        return reviews
     
     def save_data(self, data: List[Dict[str, Any]], filename: str = None) -> str:
         """

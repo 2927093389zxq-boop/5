@@ -6,6 +6,8 @@ import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import json
+import os
 from datetime import datetime
 from core.collectors.market_collector import fetch_all_trends, get_all_sources, DATA_SOURCES
 
@@ -194,7 +196,91 @@ def render_detailed_data(trends):
 def render_source_management(sources):
     """Render data source management interface."""
     st.subheader("数据源管理")
-    st.info("已集成的权威数据源列表")
+    
+    # 添加URL管理接口
+    st.markdown("##### 🔗 添加自定义数据源")
+    st.info("在此添加您自己的权威数据源URL，这些数据将提供给爬虫爬取并供智能分析参考")
+    
+    with st.expander("➕ 添加新数据源", expanded=False):
+        with st.form("add_data_source"):
+            col1, col2 = st.columns(2)
+            with col1:
+                new_name = st.text_input("数据源名称", placeholder="例如: Statista Electronics Market")
+                new_url = st.text_input("数据源URL", placeholder="https://example.com/data")
+            with col2:
+                new_description = st.text_area("描述", placeholder="简要描述此数据源提供的信息")
+                new_credibility = st.slider("可信度评分", 0.0, 1.0, 0.95, 0.05)
+            
+            submit_button = st.form_submit_button("添加数据源")
+            
+            if submit_button:
+                if new_name and new_url:
+                    # 保存到配置文件
+                    config_file = "config/custom_data_sources.json"
+                    os.makedirs("config", exist_ok=True)
+                    
+                    # 加载现有配置
+                    custom_sources = []
+                    if os.path.exists(config_file):
+                        try:
+                            with open(config_file, 'r', encoding='utf-8') as f:
+                                custom_sources = json.load(f)
+                        except:
+                            custom_sources = []
+                    
+                    # 添加新数据源
+                    custom_sources.append({
+                        "name": new_name,
+                        "url": new_url,
+                        "description": new_description,
+                        "credibility": new_credibility,
+                        "added_at": pd.Timestamp.now().isoformat()
+                    })
+                    
+                    # 保存
+                    with open(config_file, 'w', encoding='utf-8') as f:
+                        json.dump(custom_sources, f, ensure_ascii=False, indent=2)
+                    
+                    st.success(f"✅ 已添加数据源: {new_name}")
+                    st.info("💡 此数据源将在下次数据采集时被爬虫使用")
+                    st.rerun()
+                else:
+                    st.error("请填写名称和URL")
+    
+    # 显示自定义数据源
+    st.markdown("##### 📋 自定义数据源列表")
+    config_file = "config/custom_data_sources.json"
+    if os.path.exists(config_file):
+        try:
+            with open(config_file, 'r', encoding='utf-8') as f:
+                custom_sources = json.load(f)
+            
+            if custom_sources:
+                for idx, source in enumerate(custom_sources):
+                    col1, col2, col3 = st.columns([3, 2, 1])
+                    
+                    with col1:
+                        st.markdown(f"**{source['name']}**")
+                        st.caption(source.get('description', ''))
+                    
+                    with col2:
+                        st.markdown(f"[访问URL]({source['url']})")
+                        st.caption(f"添加时间: {source.get('added_at', 'N/A')[:10]}")
+                    
+                    with col3:
+                        st.metric("可信度", f"{source['credibility']:.0%}")
+                    
+                    st.markdown("---")
+            else:
+                st.info("暂无自定义数据源，点击上方'添加新数据源'开始添加")
+        except Exception as e:
+            st.error(f"加载自定义数据源失败: {e}")
+    else:
+        st.info("暂无自定义数据源，点击上方'添加新数据源'开始添加")
+    
+    st.markdown("---")
+    st.markdown("##### 🌐 已集成的权威数据源")
+    st.caption("系统内置的权威数据源")
     
     # Create a dataframe for better display
     df_sources = pd.DataFrame(sources)
