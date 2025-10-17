@@ -349,19 +349,51 @@ class MyCustomStrategy(StrategyPlugin):
 - 持续学习和自动调优
 - 历史数据驱动决策
 
-### 3. 多平台支持
-系统已支持多个电商平台：
-- Amazon
-- Shopee  
-- eBay
+### 3. 多平台支持 (28个平台)
+系统现已支持28个主流电商平台：
+- **Amazon** - 亚马逊（美国、全球）
+- **Shopee** - 虾皮（东南亚）
+- **eBay** - eBay（全球）
+- **AliExpress** - 速卖通
+- **Etsy** - 手工艺品市场
+- **Mercari** - 日本二手交易
+- **Tokopedia** - 印尼电商
+- **Lazada** - 东南亚电商
+- **Flipkart** - 印度电商
+- **Coupang** - 韩国电商
+- **Rakuten Japan** - 乐天日本
+- **TikTok Shop** - 抖音商城
+- **Target** - 塔吉特（美国）
+- **Temu** - 拼多多海外版
+- **Ozon** - 俄罗斯电商
+- **Wildberries** - 俄罗斯电商
+- **Yandex Market** - 俄罗斯电商
+- **Mercadolibre** - 拉美电商
+- **Allegro** - 波兰电商
+- **Cdiscount** - 法国电商
+- **Otto** - 德国电商
+- **Jumia** - 非洲电商
+- **Noon** - 中东电商
+- **Onbuy** - 英国电商
+- **Joom** - 拉脱维亚电商
+- **Faire** - 批发市场
+- **Fordeal** - 阿联酋电商
+- **Fyndia** - 印度电商
+- **Falabella** - 智利/拉美电商
 
-添加新平台：
+快速使用多平台采集：
 ```python
-# core/data_fetcher.py
-def _fetch_newplatform_data(keyword, ...):
-    # 实现新平台采集逻辑
-    pass
+from scrapers.multi_platform_scraper import scrape_platform
+
+# 采集任意平台数据 / Scrape from any platform
+products = scrape_platform(
+    platform_name="shopee",
+    url="https://shopee.ph/search?keyword=phone",
+    max_items=50
+)
 ```
+
+详细文档：[多平台爬虫使用指南](docs/MULTI_PLATFORM_SCRAPER_GUIDE.md)
 
 ## 性能优化建议
 
