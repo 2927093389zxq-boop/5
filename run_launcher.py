@@ -25,6 +25,7 @@ from ui.auto_evolution import render_auto_evolution
 from ui.auto_patch_view import render_auto_patch
 from ui.ai_learning_center import render_ai_learning_center
 from ui.source_attribution import render_sources
+from ui.authoritative_data_center import render_authoritative_data_center
 
 # 全局遥测对象
 telemetry = None
@@ -143,15 +144,7 @@ def route_intelligent_platform(sub_menu):
     elif sub_menu == "原型测试":
         render_prototype()
     elif sub_menu == "权威数据中心":
-        st.header("权威数据中心")
-        st.info("示例来源：1688 / QuestMobile / 艾瑞 / 易观 等")
-        for d in fetch_all_trends():
-            st.markdown(
-                f"**来源**：[{d.get('source')}]({d.get('url')})  \n"
-                f"- 时间：{d.get('fetched_at')}  \n"
-                f"- 内容：{d.get('metric', d.get('data',''))}  \n"
-                f"- 权威度：{d.get('credibility','N/A')}"
-            )
+        render_authoritative_data_center()
     elif sub_menu == "数据来源追踪":
         render_sources()
     elif sub_menu == "YouTube":
