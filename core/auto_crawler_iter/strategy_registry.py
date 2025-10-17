@@ -1,5 +1,10 @@
 import random
 from typing import Dict, List
+try:
+    from .ml_strategy_ranker import MLStrategyRanker
+    ML_AVAILABLE = True
+except ImportError:
+    ML_AVAILABLE = False
 
 ISSUE_STRATEGY_MAP = {
     "low_yield": "extend_selectors",
@@ -11,16 +16,40 @@ ISSUE_STRATEGY_MAP = {
 class StrategyRegistry:
     def __init__(self, cfg: Dict):
         self.cfg = cfg
+        self.ml_ranker = None
+        
+        # 初始化ML排序器 / Initialize ML ranker
+        if ML_AVAILABLE and cfg.get("ml_ranking_enabled", False):
+            try:
+                self.ml_ranker = MLStrategyRanker()
+            except Exception as e:
+                print(f"ML排序器初始化失败 / ML ranker initialization failed: {e}")
 
-    def pick_strategies(self, issues: List[str]) -> List[str]:
+    def pick_strategies(self, issues: List[str], current_metrics: Dict = None) -> List[str]:
         enabled = set(self.cfg.get("strategies_enabled", []))
         chosen: List[str] = []
         for issue in issues:
             strat = ISSUE_STRATEGY_MAP.get(issue)
             if strat and strat in enabled and strat not in chosen:
                 chosen.append(strat)
+        
+        # 如果没有选中策略且启用了ML排序 / If no strategies chosen and ML ranking enabled
         if not chosen and enabled:
-            chosen.append(random.choice(list(enabled)))
+            if self.ml_ranker and current_metrics:
+                # 使用ML排序选择最佳策略 / Use ML ranking to select best strategy
+                strategy_options = [[s] for s in enabled]
+                try:
+                    best_strategy = self.ml_ranker.get_best_strategy(strategy_options, current_metrics)
+                    if best_strategy:
+                        chosen = best_strategy
+                    else:
+                        chosen.append(random.choice(list(enabled)))
+                except Exception as e:
+                    print(f"ML排序失败，使用随机选择 / ML ranking failed, using random: {e}")
+                    chosen.append(random.choice(list(enabled)))
+            else:
+                chosen.append(random.choice(list(enabled)))
+        
         return chosen
 
     def materialize(self, strategy_list: List[str]) -> Dict:

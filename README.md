@@ -103,10 +103,32 @@ pytest -q
 - 日志中避免包含敏感数据（已简化）
 
 ## 路线图
-- (短期) 增加更多平台适配 (Shopee, eBay)
-- (中期) 策略效果数据驱动 ML 排序
-- (中期) i18n 国际化
-- (长期) 插件化策略与评估器 / 强化学习自动调参
+### 短期 (已完成 ✅)
+- ✅ 增加更多平台适配 (Shopee, eBay)
+  - 模块：`core/data_fetcher.py`
+  - 支持 Amazon, Shopee, eBay 三大平台
+
+### 中期 (已完成 ✅)
+- ✅ 策略效果数据驱动 ML 排序
+  - 模块：`core/auto_crawler_iter/ml_strategy_ranker.py`
+  - 基于随机森林的策略排序
+  - 从历史数据学习最优策略
+- ✅ i18n 国际化
+  - 模块：`core/i18n.py`
+  - 支持中文 (zh_CN) 和英文 (en_US)
+  - 配置文件：`config/i18n/`
+
+### 长期 (已完成 ✅)
+- ✅ 插件化策略与评估器
+  - 模块：`core/plugin_system.py`
+  - 策略插件接口：`plugins/strategies/`
+  - 评估器插件接口：`plugins/evaluators/`
+- ✅ 强化学习自动调参
+  - 模块：`core/rl_auto_tuner.py`
+  - 基于 Q-Learning 的参数优化
+  - 支持持续学习和自动调优
+
+查看路线图详情请访问 UI 中的 "路线图" 页面
 
 ## 旧组件
 `core/ai/scheduler.py` 已被 `scheduler.py` 取代，不建议继续使用。
