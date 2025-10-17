@@ -1,57 +1,31 @@
 
 import streamlit as st
 import pandas as pd
-from core.saas.services.store_service import StoreService
 from datetime import datetime, timedelta
 import random
+import json
+import os
 
 def render_saas_dashboard():
     """渲染 SaaS 仪表板"""
     st.title("🛍️ 电商 SaaS 仪表盘")
     
-    # 初始化服务
-    store_service = StoreService()
-    
-    # 获取所有店铺
-    stores = store_service.list_stores()
-    
-    if not stores:
-        st.info("暂无店铺信息，请先添加店铺。")
-        if st.button("添加示例店铺"):
-            # 添加示例店铺
-            from core.saas.models.store import Store
-            store = Store(
-                name="示例店铺",
-                platform="Shopify",
-                status="active"
-            )
-            store_service.save_store(store)
-            st.success("已添加示例店铺")
-            st.rerun()
-        return
-    
-    # 店铺选择器
-    selected_store = st.selectbox(
-        "选择店铺",
-        options=[store.store_id for store in stores],
-        format_func=lambda x: next((s.name for s in stores if s.store_id == x), x)
-    )
-    
-    # 获取选中的店铺
-    store = next((s for s in stores if s.store_id == selected_store), None)
-    
-    if not store:
-        st.warning("未找到选中的店铺")
-        return
+    # 示例店铺数据
+    store_data = {
+        "name": "示例店铺",
+        "platform": "Shopify",
+        "status": "运营中",
+        "created_at": "2024-01-15"
+    }
     
     # 基础信息卡片
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("平台", store.platform)
+        st.metric("平台", store_data["platform"])
     with col2:
-        st.metric("状态", store.status)
+        st.metric("状态", store_data["status"])
     with col3:
-        st.metric("创建日期", store.created_at.strftime("%Y-%m-%d"))
+        st.metric("创建日期", store_data["created_at"])
     
     # 模拟数据
     st.subheader("📊 销售概览")
