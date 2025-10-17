@@ -463,5 +463,43 @@ products = scrape_platform(
 
 查看路线图详情请访问 UI 中的 "路线图" 页面
 
+## 未来增强功能 / Future Enhancements
+
+✅ **已实现 / Implemented:**
+
+### 1. Selenium/Playwright for JavaScript-rendered content
+为 JavaScript 呈现的内容添加 Selenium/Playwright
+
+- **模块**: `core/browser_automation.py`
+- **功能**: 使用 Playwright 支持抓取 JavaScript 渲染的网站
+- **特性**: 支持 Chromium/Firefox/WebKit，无头模式，页面滚动，截图
+
+### 2. Distributed scraping with task queues
+使用任务队列实现分布式抓取
+
+- **模块**: `core/task_queue.py`
+- **功能**: 基于优先级的任务队列系统，支持多线程工作池
+- **特性**: 自动重试，任务状态跟踪，队列统计
+
+### 3. Data validation and deduplication
+添加数据验证和重复数据删除
+
+- **模块**: `core/data_validation.py`
+- **功能**: 灵活的验证规则，基于哈希的去重
+- **特性**: 类型检查，正则验证，长度/范围验证，质量报告
+
+### 4. Real-time monitoring dashboard
+创建监控仪表板以查看实时状态
+
+- **模块**: `core/monitoring.py`, `ui/monitoring_view.py`
+- **功能**: 实时指标收集和可视化仪表板
+- **特性**: 性能跟踪，自动警报，平台统计，时间序列数据
+
+📖 **详细文档**: [docs/FUTURE_ENHANCEMENTS.md](docs/FUTURE_ENHANCEMENTS.md)
+
+🚀 **快速开始**: 运行 `python examples/enhanced_pipeline_demo.py` 查看所有功能的集成演示
+
+---
+
 ## 旧组件
 `core/ai/scheduler.py` 已被 `scheduler.py` 取代，不建议继续使用。
