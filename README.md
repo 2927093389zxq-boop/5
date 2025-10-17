@@ -49,6 +49,46 @@ streamlit run run_launcher.py
 smart_start.bat
 ```
 
+## 快速示例代码
+
+### 方式1: 使用示例脚本
+```bash
+# 运行示例脚本查看所有用法
+python examples/amazon_scraper_examples.py
+```
+
+### 方式2: Python交互式使用
+```python
+from scrapers.amazon_scraper import AmazonScraper
+
+# 创建爬虫实例
+scraper = AmazonScraper()
+
+# 采集商品列表
+products = scraper.scrape_list_page(
+    url="https://www.amazon.com/s?k=laptop",
+    max_items=50
+)
+
+# 采集商品详情
+detail = scraper.scrape_product_detail(asin="B08N5WRWNW")
+
+# 保存数据
+scraper.save_data(products)
+```
+
+### 方式3: 使用便捷函数
+```python
+from scrapers.amazon_scraper import scrape_amazon
+
+# 快速采集
+products = scrape_amazon(
+    url="https://www.amazon.com/bestsellers",
+    max_items=100,
+    deep_detail=True  # 是否采集详情页
+)
+```
+
 ## Amazon爬虫使用指南
 
 ### 基础使用

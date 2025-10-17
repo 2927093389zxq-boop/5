@@ -16,7 +16,7 @@ import time
 import random
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from scrapers.logger import log_info, log_error, log_warning
 
@@ -253,7 +253,7 @@ class AmazonScraper:
                             "rating": rating,
                             "review_count": review_count,
                             "url": product_url,
-                            "scraped_at": datetime.utcnow().isoformat() + "Z",
+                            "scraped_at": datetime.now(timezone.utc).isoformat(),
                             "source_url": url
                         }
                         
@@ -295,7 +295,7 @@ class AmazonScraper:
         detail = {
             "asin": asin,
             "url": url,
-            "scraped_at": datetime.utcnow().isoformat() + "Z"
+            "scraped_at": datetime.now(timezone.utc).isoformat()
         }
         
         try:
@@ -358,7 +358,7 @@ class AmazonScraper:
                 json.dump({
                     "items": data,
                     "total_count": len(data),
-                    "scraped_at": datetime.utcnow().isoformat() + "Z"
+                    "scraped_at": datetime.now(timezone.utc).isoformat()
                 }, f, ensure_ascii=False, indent=2)
             
             log_info(f"数据已保存 / Data saved: {filepath}")

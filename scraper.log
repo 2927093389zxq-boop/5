@@ -199,3 +199,4 @@ Traceback (most recent call last):
   File "C:\Users\29270\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 503, in _make_subprocess_transport
     raise NotImplementedError
 NotImplementedError
+2025-10-17 17:45:50,403 - scrapers - INFO - 数据已保存 / Data saved: data/amazon/example_products.json
