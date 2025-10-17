@@ -282,7 +282,7 @@ All roadmap items have been fully implemented and tested!
 ### 运行测试 / Run Tests
 
 ```bash
-PYTHONPATH=/home/runner/work/5/5:$PYTHONPATH python test/integration/test_roadmap_implementation.py
+PYTHONPATH=$(pwd):$PYTHONPATH python test/integration/test_roadmap_implementation.py
 ```
 
 ### 使用新功能 / Use New Features

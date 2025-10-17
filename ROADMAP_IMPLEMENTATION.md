@@ -248,7 +248,7 @@ best_params = tuner.get_best_params(state)
 
 **运行测试:**
 ```bash
-PYTHONPATH=/home/runner/work/5/5:$PYTHONPATH python test/integration/test_roadmap_implementation.py
+PYTHONPATH=$(pwd):$PYTHONPATH python test/integration/test_roadmap_implementation.py
 ```
 
 **测试结果:**
