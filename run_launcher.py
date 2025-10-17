@@ -36,7 +36,7 @@ MENU_STRUCTURE = {
         "权威数据中心", "数据来源追踪", "YouTube", "TikTok",
         "Amazon采集工具", "爬虫自迭代",
         "AI 学习中心", "AI 自主迭代", "AI 自动修复",
-        "API 管理", "政策中心", "系统概览", "日志与设置"
+        "API 管理", "政策中心", "路线图", "系统概览", "日志与设置"
     ],
     "SaaS平台": ["SaaS仪表盘", "用户管理", "计费管理"],
     "ERP系统": ["库存管理", "产品管理", "订单管理"]
@@ -186,6 +186,9 @@ def route_intelligent_platform(sub_menu):
                 f"**{p.get('source',{}).get('agency','未知')}** - {p.get('fetched_at')}  \n"
                 f"{p.get('snippet','')}"
             )
+    elif sub_menu == "路线图":
+        from ui.roadmap_view import render_roadmap
+        render_roadmap()
     elif sub_menu == "日志与设置":
         st.header("日志与设置")
         st.write("请在 config/ 下维护系统配置（示例：调度、密钥、邮箱等）。")

@@ -51,7 +51,7 @@ class CrawlerIterationEngine:
             issues = self.issue_detector.detect(metrics)
             log_info(f"[ITER] Issues: {issues}")
 
-            strategies = self.strategy_registry.pick_strategies(issues)
+            strategies = self.strategy_registry.pick_strategies(issues, current_metrics=metrics)
             patch_conf = self.strategy_registry.materialize(strategies)
 
             original_source = open(self.production_file, "r", encoding="utf-8").read()
