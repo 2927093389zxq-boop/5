@@ -14,7 +14,7 @@ class MetricsCollector:
     - avg_list_time
     """
 
-    def __init__(self, data_dir: str = "data", log_file: str = "scraper.log"):
+    def __init__(self, data_dir: str = "data/amazon", log_file: str = "scraper.log"):
         self.data_dir = data_dir
         self.log_file = log_file
 
