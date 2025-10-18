@@ -32,7 +32,7 @@ def render_api_admin():
     st.markdown("统一管理所有第三方API配置，支持多平台数据接口")
     
     # 创建标签页
-    tab1, tab2, tab3 = st.tabs(["📋 已保存API", "➕ 添加新API", "📊 使用统计"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 已保存API", "➕ 添加新API", "🤖 AI模型集成", "📊 使用统计"])
     
     apis = load_apis()
     
@@ -290,6 +290,11 @@ def render_api_admin():
                         st.rerun()
     
     with tab3:
+        # AI模型集成标签页
+        from ui.ai_model_integration import render_ai_model_integration
+        render_ai_model_integration()
+    
+    with tab4:
         st.markdown("### 📊 API使用统计")
         st.info("此功能将显示每个API的调用次数、成功率等统计信息")
         

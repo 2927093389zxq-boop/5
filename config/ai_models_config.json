@@ -1,0 +1,19 @@
+{
+  "openai_gpt-3.5-turbo_1760810520.904956": {
+    "id": "openai_gpt-3.5-turbo_1760810520.904956",
+    "provider": "openai",
+    "provider_name": "OpenAI",
+    "model_name": "gpt-3.5-turbo",
+    "api_key": "sk-test-key-for-demo-only",
+    "api_base": "https://api.openai.com/v1",
+    "endpoints": {
+      "chat": "/chat/completions",
+      "completion": "/completions",
+      "embedding": "/embeddings"
+    },
+    "enabled": true,
+    "created_at": "2025-10-18T18:02:00.904963",
+    "updated_at": "2025-10-18T18:02:00.904966",
+    "description": "演示用GPT-3.5模型"
+  }
+}
