@@ -26,7 +26,7 @@ def render_authoritative_data_center():
         sources = get_all_sources()
     
     # Create tabs for different views
-    tab1, tab2, tab3 = st.tabs(["📈 数据可视化", "📋 详细数据", "🔍 数据源管理"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📈 数据可视化", "📋 详细数据", "🔍 数据源管理", "📥 数据采集"])
     
     with tab1:
         render_visualizations(trends, sources)
@@ -36,6 +36,9 @@ def render_authoritative_data_center():
     
     with tab3:
         render_source_management(sources)
+    
+    with tab4:
+        render_data_collection()
 
 
 def render_visualizations(trends, sources):
@@ -346,3 +349,250 @@ def render_source_management(sources):
                      '<extra></extra>'
     )
     st.plotly_chart(fig, use_container_width=True)
+
+
+def render_data_collection():
+    """Render data collection tab with hourly scraping and manual upload."""
+    st.subheader("📥 数据采集与存储")
+    st.info("支持自动爬取权威数据源或手动上传数据文件")
+    
+    # Create two columns for different collection methods
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.markdown("##### 🤖 自动爬取配置")
+        
+        # Scraping configuration
+        enable_auto_scrape = st.checkbox(
+            "启用自动爬取",
+            value=False,
+            help="启用后，系统将每小时自动爬取权威数据源"
+        )
+        
+        if enable_auto_scrape:
+            scrape_interval = st.selectbox(
+                "爬取间隔",
+                ["每小时", "每2小时", "每6小时", "每12小时", "每24小时"],
+                index=0
+            )
+            
+            # Source selection
+            sources = get_all_sources()
+            source_names = [s['name'] for s in sources]
+            
+            selected_sources = st.multiselect(
+                "选择要爬取的数据源",
+                source_names,
+                default=source_names[:3],
+                help="选择要定时爬取的权威数据源"
+            )
+            
+            st.markdown("**去重设置:**")
+            dedupe_method = st.radio(
+                "去重方式",
+                ["基于URL", "基于内容哈希", "基于标题+时间"],
+                horizontal=True,
+                help="防止采集重复信息"
+            )
+            
+            # Storage location
+            storage_path = st.text_input(
+                "存储路径",
+                value="data/authoritative_sources",
+                help="采集数据的保存路径"
+            )
+            
+            if st.button("💾 保存爬取配置", type="primary"):
+                config = {
+                    "enabled": enable_auto_scrape,
+                    "interval": scrape_interval,
+                    "sources": selected_sources,
+                    "dedupe_method": dedupe_method,
+                    "storage_path": storage_path,
+                    "last_updated": datetime.now().isoformat()
+                }
+                
+                # Save configuration
+                os.makedirs("config", exist_ok=True)
+                with open("config/scraping_config.json", 'w', encoding='utf-8') as f:
+                    json.dump(config, f, ensure_ascii=False, indent=2)
+                
+                st.success("✅ 爬取配置已保存！")
+                st.info(f"系统将{scrape_interval}爬取选定的数据源")
+        else:
+            st.info("自动爬取未启用")
+            st.caption("启用后可配置定时爬取任务")
+    
+    with col2:
+        st.markdown("##### 📤 手动上传数据")
+        
+        st.info("如果爬虫无法访问，可以手动上传PDF、TXT或图片文件")
+        
+        # File uploader
+        upload_type = st.radio(
+            "上传类型",
+            ["PDF文档", "文本文件", "图片"],
+            horizontal=True
+        )
+        
+        if upload_type == "PDF文档":
+            uploaded_file = st.file_uploader(
+                "选择PDF文件",
+                type=['pdf'],
+                help="上传包含市场数据的PDF文档"
+            )
+            
+            if uploaded_file:
+                st.success(f"已选择: {uploaded_file.name}")
+                
+                # Metadata
+                with st.form("pdf_metadata"):
+                    title = st.text_input("文档标题", placeholder="例如：2024年电商市场报告")
+                    source = st.text_input("来源", placeholder="例如：McKinsey, Statista")
+                    date = st.date_input("发布日期")
+                    tags = st.text_input("标签", placeholder="用逗号分隔，例如：电商,市场,趋势")
+                    
+                    submitted = st.form_submit_button("📥 保存PDF")
+                    
+                    if submitted:
+                        if not title:
+                            st.error("请填写文档标题")
+                        else:
+                            # Save PDF
+                            save_dir = "data/authoritative_sources/pdf"
+                            os.makedirs(save_dir, exist_ok=True)
+                            
+                            # Create safe filename
+                            import re
+                            safe_title = re.sub(r'[^\w\s-]', '', title).strip()[:50]
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            filename = f"{safe_title}_{timestamp}.pdf"
+                            filepath = os.path.join(save_dir, filename)
+                            
+                            # Save file
+                            with open(filepath, 'wb') as f:
+                                f.write(uploaded_file.getbuffer())
+                            
+                            # Save metadata
+                            metadata = {
+                                "title": title,
+                                "source": source,
+                                "date": str(date),
+                                "tags": [t.strip() for t in tags.split(',') if t.strip()],
+                                "filename": filename,
+                                "filepath": filepath,
+                                "uploaded_at": datetime.now().isoformat()
+                            }
+                            
+                            metadata_file = filepath.replace('.pdf', '_metadata.json')
+                            with open(metadata_file, 'w', encoding='utf-8') as f:
+                                json.dump(metadata, f, ensure_ascii=False, indent=2)
+                            
+                            st.success(f"✅ PDF已保存: {filepath}")
+                            st.balloons()
+        
+        elif upload_type == "文本文件":
+            uploaded_file = st.file_uploader(
+                "选择TXT文件",
+                type=['txt'],
+                help="上传包含市场数据的文本文件"
+            )
+            
+            if uploaded_file:
+                st.success(f"已选择: {uploaded_file.name}")
+                
+                # Preview content
+                content = uploaded_file.read().decode('utf-8', errors='ignore')
+                st.text_area("内容预览", content[:500] + "...", height=200)
+                
+                with st.form("txt_metadata"):
+                    title = st.text_input("文件标题")
+                    source = st.text_input("来源")
+                    tags = st.text_input("标签", placeholder="用逗号分隔")
+                    
+                    submitted = st.form_submit_button("📥 保存文本")
+                    
+                    if submitted and title:
+                        save_dir = "data/authoritative_sources/txt"
+                        os.makedirs(save_dir, exist_ok=True)
+                        
+                        import re
+                        safe_title = re.sub(r'[^\w\s-]', '', title).strip()[:50]
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        filename = f"{safe_title}_{timestamp}.txt"
+                        filepath = os.path.join(save_dir, filename)
+                        
+                        with open(filepath, 'w', encoding='utf-8') as f:
+                            f.write(content)
+                        
+                        st.success(f"✅ 文本已保存: {filepath}")
+        
+        else:  # 图片
+            uploaded_file = st.file_uploader(
+                "选择图片文件",
+                type=['png', 'jpg', 'jpeg'],
+                help="上传包含数据的图片（如图表、截图）"
+            )
+            
+            if uploaded_file:
+                st.image(uploaded_file, caption="上传的图片", use_container_width=True)
+                
+                with st.form("image_metadata"):
+                    title = st.text_input("图片标题")
+                    description = st.text_area("描述")
+                    source = st.text_input("来源")
+                    
+                    submitted = st.form_submit_button("📥 保存图片")
+                    
+                    if submitted and title:
+                        save_dir = "data/authoritative_sources/images"
+                        os.makedirs(save_dir, exist_ok=True)
+                        
+                        import re
+                        safe_title = re.sub(r'[^\w\s-]', '', title).strip()[:50]
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        ext = uploaded_file.name.split('.')[-1]
+                        filename = f"{safe_title}_{timestamp}.{ext}"
+                        filepath = os.path.join(save_dir, filename)
+                        
+                        with open(filepath, 'wb') as f:
+                            f.write(uploaded_file.getbuffer())
+                        
+                        st.success(f"✅ 图片已保存: {filepath}")
+    
+    # Saved files section
+    st.markdown("---")
+    st.markdown("### 📁 已保存的数据文件")
+    
+    base_dir = "data/authoritative_sources"
+    if os.path.exists(base_dir):
+        # Count files
+        pdf_count = len([f for f in os.listdir(os.path.join(base_dir, 'pdf')) if f.endswith('.pdf')]) if os.path.exists(os.path.join(base_dir, 'pdf')) else 0
+        txt_count = len([f for f in os.listdir(os.path.join(base_dir, 'txt')) if f.endswith('.txt')]) if os.path.exists(os.path.join(base_dir, 'txt')) else 0
+        img_count = len([f for f in os.listdir(os.path.join(base_dir, 'images')) if f.endswith(('.png', '.jpg', '.jpeg'))]) if os.path.exists(os.path.join(base_dir, 'images')) else 0
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("PDF文档", pdf_count)
+        with col2:
+            st.metric("文本文件", txt_count)
+        with col3:
+            st.metric("图片文件", img_count)
+    else:
+        st.info("暂无保存的数据文件")
+    
+    # Search interface
+    st.markdown("---")
+    st.markdown("### 🔍 搜索已保存数据")
+    
+    search_query = st.text_input(
+        "输入关键词搜索",
+        placeholder="搜索标题、标签、内容...",
+        help="使用AI搜索已保存的所有数据文件"
+    )
+    
+    if st.button("🔍 开始搜索") and search_query:
+        with st.spinner("AI正在搜索相关数据..."):
+            # This would integrate with AI to search through saved files
+            st.info(f"搜索功能开发中...关键词: {search_query}")
+            st.caption("将使用AI分析PDF内容、文本和图片OCR结果进行智能搜索")

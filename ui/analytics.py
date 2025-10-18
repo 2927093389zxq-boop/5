@@ -269,57 +269,261 @@ def render_analytics():
             pass
     
     with tab2:
-        st.markdown("#### 数据指标异常检测")
-        st.write("示例输入：历史销量（用于检测异常）")
-
-        data = [100, 103, 120, 115, 420, 130, 110]
+        st.markdown("#### 🔍 数据指标异常检测")
+        st.info("使用Z-score、IQR、移动平均等多种方法检测系统运营指标异常")
         
-        # Create interactive plotly chart
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=list(range(1, len(data) + 1)),
-            y=data,
-            mode='lines+markers',
-            name='销量',
-            line=dict(color='#1f77b4', width=2),
-            marker=dict(size=8)
-        ))
+        # 数据源选择
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            data_source = st.selectbox(
+                "选择数据源",
+                ["主页热门产品数据", "自定义API/URL数据"],
+                help="选择要分析的数据来源"
+            )
         
-        # Detect and mark anomalies
-        anomaly_indices = detect_anomalies(data)
-        if anomaly_indices:
-            anomaly_x = [i + 1 for i in anomaly_indices]
-            anomaly_y = [data[i] for i in anomaly_indices]
-            fig.add_trace(go.Scatter(
-                x=anomaly_x,
-                y=anomaly_y,
-                mode='markers',
-                name='异常点',
-                marker=dict(color='red', size=12, symbol='x')
-            ))
+        with col2:
+            detection_method = st.selectbox(
+                "检测方法",
+                ["综合检测", "Z-score", "IQR", "移动平均"],
+                help="选择异常检测算法"
+            )
         
-        fig.update_layout(
-            title="销量趋势分析",
-            xaxis_title="时间周期",
-            yaxis_title="销量",
-            hovermode='x unified',
-            height=400
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-        st.markdown("#### 异常检测结果")
-        if anomaly_indices:
-            for idx in anomaly_indices:
-                st.warning(f"在位置 {idx+1} 检测到异常点，值为 {data[idx]}。")
+        st.markdown("---")
+        
+        # 如果选择自定义数据源
+        if data_source == "自定义API/URL数据":
+            st.markdown("##### 📥 自定义数据输入")
             
-            # Calculate anomaly percentage
-            if idx > 0:
-                prev_val = data[idx-1]
-                change_pct = ((data[idx] - prev_val) / prev_val) * 100
-                st.markdown("#### AI 解释")
-                st.info(f"系统检测到第 {idx+1} 个数据点出现异常增长（约 +{change_pct:.1f}%），可能与促销活动或投放策略调整有关。")
-        else:
-            st.success("未发现明显异常。")
+            input_type = st.radio("输入类型", ["API接口", "URL地址", "手动输入"], horizontal=True)
+            
+            if input_type == "API接口":
+                api_url = st.text_input(
+                    "API端点",
+                    placeholder="https://api.example.com/metrics",
+                    help="输入返回JSON格式指标数据的API地址"
+                )
+                api_key = st.text_input("API密钥 (可选)", type="password")
+                
+                if st.button("📡 获取API数据"):
+                    if api_url:
+                        st.info(f"正在从 {api_url} 获取数据...")
+                        # 这里应该实现实际的API调用
+                        st.warning("API功能待实现，请使用手动输入模式")
+                    else:
+                        st.error("请输入API端点")
+            
+            elif input_type == "URL地址":
+                url = st.text_input(
+                    "数据URL",
+                    placeholder="https://example.com/data.json",
+                    help="输入包含数据的网页或JSON文件URL"
+                )
+                
+                if st.button("🌐 获取URL数据"):
+                    if url:
+                        st.info(f"正在从 {url} 获取数据...")
+                        st.warning("URL爬取功能待实现，请使用手动输入模式")
+                    else:
+                        st.error("请输入URL地址")
+            
+            else:  # 手动输入
+                st.caption("以JSON格式输入指标数据")
+                manual_data = st.text_area(
+                    "JSON数据",
+                    value='{\n  "active_users": [1200, 1250, 1180, 1300, 2500, 1280],\n  "new_users": [100, 110, 95, 120, 105, 115]\n}',
+                    height=200,
+                    help="输入包含时间序列数据的JSON对象"
+                )
+        
+        st.markdown("---")
+        st.markdown("##### 📊 系统运营指标监控")
+        
+        # 生成模拟数据 (实际应该从真实系统获取)
+        import random
+        np.random.seed(42)
+        
+        # 定义各项指标的模拟数据
+        time_points = 30  # 30天的数据
+        
+        metrics_data = {
+            "活跃用户数": [1000 + random.randint(-100, 100) + i*10 for i in range(time_points)],
+            "新注册用户数": [50 + random.randint(-10, 20) for _ in range(time_points)],
+            "留存率": [75 + random.uniform(-5, 5) for _ in range(time_points)],
+            "转化率": [12 + random.uniform(-2, 3) for _ in range(time_points)],
+            "订单成功率": [95 + random.uniform(-3, 2) for _ in range(time_points)],
+            "支付成功率": [97 + random.uniform(-2, 1) for _ in range(time_points)],
+            "用户投诉率": [2 + random.uniform(-0.5, 1) for _ in range(time_points)],
+            "负反馈率": [3 + random.uniform(-0.8, 1.5) for _ in range(time_points)],
+            "接口调用成功率": [99 + random.uniform(-1, 0.5) for _ in range(time_points)],
+            "平均响应时间": [200 + random.randint(-50, 100) for _ in range(time_points)]
+        }
+        
+        # 注入一些异常值
+        metrics_data["活跃用户数"][15] = 2500  # 异常高峰
+        metrics_data["转化率"][20] = 5  # 异常下跌
+        metrics_data["平均响应时间"][10] = 800  # 异常延迟
+        
+        # 选择要分析的指标
+        selected_metrics = st.multiselect(
+            "选择要监控的指标",
+            list(metrics_data.keys()),
+            default=list(metrics_data.keys())[:5],
+            help="选择一个或多个指标进行异常检测"
+        )
+        
+        if st.button("🚀 开始异常检测", type="primary"):
+            if not selected_metrics:
+                st.error("请至少选择一个指标")
+            else:
+                with st.spinner("正在进行异常检测分析..."):
+                    from core.processing.anomaly_detector import (
+                        analyze_system_metrics,
+                        calculate_health_score,
+                        detect_anomalies,
+                        detect_anomalies_iqr,
+                        detect_anomalies_moving_average
+                    )
+                    
+                    # 过滤选中的指标
+                    selected_data = {k: v for k, v in metrics_data.items() if k in selected_metrics}
+                    
+                    # 执行异常检测
+                    analysis_results = analyze_system_metrics(selected_data)
+                    health_score, status = calculate_health_score(selected_data)
+                    
+                    # 显示系统健康度
+                    st.markdown("---")
+                    st.markdown("### 🏥 系统健康度评分")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("健康评分", f"{health_score:.1f}/100")
+                    with col2:
+                        st.metric("状态", status.split(' - ')[0])
+                    with col3:
+                        total_anomalies = sum(r.get('anomaly_count', 0) for r in analysis_results.values())
+                        st.metric("检测到异常", f"{total_anomalies} 个")
+                    
+                    st.progress(health_score / 100)
+                    st.caption(status)
+                    
+                    # 显示每个指标的详细分析
+                    st.markdown("---")
+                    st.markdown("### 📈 指标详细分析")
+                    
+                    for metric_name, result in analysis_results.items():
+                        if 'error' in result:
+                            st.error(f"**{metric_name}**: {result['error']}")
+                            continue
+                        
+                        with st.expander(f"📊 {metric_name} - 检测到 {result['anomaly_count']} 个异常点", expanded=(result['anomaly_count'] > 0)):
+                            # 创建图表
+                            data = selected_data[metric_name]
+                            anomaly_indices = result['anomaly_indices']
+                            
+                            fig = go.Figure()
+                            
+                            # 正常数据点
+                            fig.add_trace(go.Scatter(
+                                x=list(range(1, len(data) + 1)),
+                                y=data,
+                                mode='lines+markers',
+                                name='数值',
+                                line=dict(color='#1f77b4', width=2),
+                                marker=dict(size=6)
+                            ))
+                            
+                            # 异常数据点
+                            if anomaly_indices:
+                                anomaly_x = [i + 1 for i in anomaly_indices]
+                                anomaly_y = [data[i] for i in anomaly_indices]
+                                fig.add_trace(go.Scatter(
+                                    x=anomaly_x,
+                                    y=anomaly_y,
+                                    mode='markers',
+                                    name='异常点',
+                                    marker=dict(color='red', size=12, symbol='x', line=dict(width=2, color='darkred'))
+                                ))
+                            
+                            # 添加均值线
+                            stats = result['statistics']
+                            fig.add_hline(
+                                y=stats['mean'],
+                                line_dash="dash",
+                                line_color="green",
+                                annotation_text=f"均值: {stats['mean']:.2f}"
+                            )
+                            
+                            fig.update_layout(
+                                title=f"{metric_name} 趋势分析",
+                                xaxis_title="时间点",
+                                yaxis_title="数值",
+                                hovermode='x unified',
+                                height=350
+                            )
+                            
+                            st.plotly_chart(fig, use_container_width=True)
+                            
+                            # 显示统计信息
+                            col1, col2, col3, col4 = st.columns(4)
+                            with col1:
+                                st.metric("平均值", f"{stats['mean']:.2f}")
+                            with col2:
+                                st.metric("标准差", f"{stats['std']:.2f}")
+                            with col3:
+                                st.metric("最小值", f"{stats['min']:.2f}")
+                            with col4:
+                                st.metric("最大值", f"{stats['max']:.2f}")
+                            
+                            # 显示检测方法结果
+                            st.markdown("**检测方法结果:**")
+                            methods = result['methods_used']
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.write(f"Z-score: {methods['z_score']} 个异常")
+                            with col2:
+                                st.write(f"IQR: {methods['iqr']} 个异常")
+                            with col3:
+                                st.write(f"移动平均: {methods['moving_average']} 个异常")
+                            
+                            # AI 解释
+                            if anomaly_indices:
+                                st.markdown("**🤖 AI 解释:**")
+                                for idx in anomaly_indices[:3]:  # 只显示前3个异常
+                                    if idx > 0:
+                                        prev_val = data[idx-1]
+                                        curr_val = data[idx]
+                                        change = curr_val - prev_val
+                                        change_pct = (change / prev_val * 100) if prev_val != 0 else 0
+                                        
+                                        if change > 0:
+                                            st.info(f"📈 时间点 {idx+1}: 检测到异常增长 {change_pct:+.1f}% (从 {prev_val:.2f} 到 {curr_val:.2f})，可能原因：促销活动、营销投放、季节性因素")
+                                        else:
+                                            st.warning(f"📉 时间点 {idx+1}: 检测到异常下降 {change_pct:+.1f}% (从 {prev_val:.2f} 到 {curr_val:.2f})，建议检查：系统故障、用户体验问题、竞品活动")
+                    
+                    # 保存分析结果
+                    st.markdown("---")
+                    if st.button("💾 保存异常检测结果"):
+                        import json
+                        from datetime import datetime
+                        
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        output_file = f"data/anomaly_detection_{timestamp}.json"
+                        os.makedirs("data", exist_ok=True)
+                        
+                        save_data = {
+                            "timestamp": datetime.now().isoformat(),
+                            "health_score": health_score,
+                            "status": status,
+                            "metrics": analysis_results,
+                            "raw_data": selected_data
+                        }
+                        
+                        with open(output_file, 'w', encoding='utf-8') as f:
+                            json.dump(save_data, f, ensure_ascii=False, indent=2)
+                        
+                        st.success(f"✅ 异常检测结果已保存: {output_file}")
+    
 
     
     with tab3:
