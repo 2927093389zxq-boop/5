@@ -304,13 +304,21 @@ class PeriodicScheduler:
         jobs_list = []
         for job_id, job_info in self.jobs.items():
             job = job_info['job']
+            # Get next run time safely
+            next_run = None
+            try:
+                if hasattr(job, 'next_run_time'):
+                    next_run = job.next_run_time.isoformat() if job.next_run_time else None
+            except:
+                pass
+            
             jobs_list.append({
                 'id': job_id,
                 'name': job.name,
                 'type': job_info['type'],
                 'schedule': job_info.get('schedule', job_info.get('interval', '')),
-                'next_run': job.next_run_time.isoformat() if job.next_run_time else None,
-                'pending': job.pending
+                'next_run': next_run,
+                'pending': getattr(job, 'pending', False)
             })
         return jobs_list
     
