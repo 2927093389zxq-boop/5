@@ -33,11 +33,10 @@ telemetry = None
 # 菜单配置（第 13 点：结构化 + 易扩展）
 MENU_STRUCTURE = {
     "智能体平台": [
-        "主页", "智能分析", "原型测试",
-        "权威数据中心", "数据来源追踪", "YouTube", "TikTok",
+        "主页", "智能分析", 
+        "权威数据中心", "YouTube", "TikTok",
         "Amazon采集工具", 
-        "AI迭代系统",
-        "API 管理", "政策中心", "系统概览", "日志与设置"
+        "API 管理", "系统概览", "日志与设置"
     ],
     "SaaS平台": ["SaaS仪表盘", "智能体对接", "用户管理", "计费管理"],
     "ERP系统": ["库存管理", "产品管理", "订单管理"]
@@ -1043,18 +1042,11 @@ def route_intelligent_platform(sub_menu):
     if sub_menu == "主页":
         render_dashboard()
     elif sub_menu == "系统概览":
-        st.header("系统概览")
-        st.metric("主机名", socket.gethostname())
-        st.metric("系统", platform.platform())
-        st.metric("时间", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        render_system_overview()
     elif sub_menu == "智能分析":
         render_analytics()
-    elif sub_menu == "原型测试":
-        render_prototype()
     elif sub_menu == "权威数据中心":
         render_authoritative_data_center()
-    elif sub_menu == "数据来源追踪":
-        render_sources()
     elif sub_menu == "YouTube":
         from ui.youtube_enhanced import render_youtube_query
         render_youtube_query()
@@ -1062,17 +1054,10 @@ def route_intelligent_platform(sub_menu):
         from ui.tiktok_enhanced import render_tiktok_module
         render_tiktok_module()
     elif sub_menu == "Amazon采集工具":
-        # 延迟导入，避免初始加载开销
-        import ui.amazon_crawl_options
-    elif sub_menu == "AI迭代系统":
-        from ui.ai_iteration_system import render_ai_iteration_system
-        render_ai_iteration_system()
+        from ui.amazon_crawl_options import render_amazon_crawl_tool
+        render_amazon_crawl_tool()
     elif sub_menu == "API 管理":
         render_api_admin()
-    elif sub_menu == "政策中心":
-        render_policy_center()
-    elif sub_menu == "系统概览":
-        render_system_overview()
     elif sub_menu == "日志与设置":
         render_log_and_settings()
 

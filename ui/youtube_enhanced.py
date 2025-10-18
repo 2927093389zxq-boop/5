@@ -21,9 +21,93 @@ def render_youtube_query():
     st.header("📺 YouTube频道深度分析")
     st.markdown("输入频道ID获取完整频道信息，包括所有视频内容分析和AI总结")
     
+    # API密钥配置UI
+    with st.expander("🔑 API密钥配置", expanded=False):
+        st.markdown("### YouTube API密钥设置")
+        st.info("💡 在此处配置您的YouTube API密钥，无需修改代码或环境变量")
+        
+        # 从环境变量或session state获取
+        current_youtube_key = st.session_state.get('youtube_api_key', os.getenv("YOUTUBE_API_KEY", ""))
+        current_openai_key = st.session_state.get('openai_api_key', os.getenv("OPENAI_API_KEY", ""))
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            youtube_key_input = st.text_input(
+                "YouTube API密钥",
+                value=current_youtube_key,
+                type="password",
+                help="从Google Cloud Console获取"
+            )
+            
+            st.markdown("**如何获取YouTube API密钥:**")
+            st.markdown("1. 访问 [Google Cloud Console](https://console.cloud.google.com/)")
+            st.markdown("2. 创建新项目或选择现有项目")
+            st.markdown("3. 启用YouTube Data API v3")
+            st.markdown("4. 创建凭据 → API密钥")
+            st.markdown("5. 复制密钥并粘贴到上方")
+        
+        with col2:
+            openai_key_input = st.text_input(
+                "OpenAI API密钥（可选）",
+                value=current_openai_key,
+                type="password",
+                help="用于AI智能总结，可选"
+            )
+            
+            st.markdown("**如何获取OpenAI API密钥:**")
+            st.markdown("1. 访问 [OpenAI平台](https://platform.openai.com/)")
+            st.markdown("2. 注册并登录账号")
+            st.markdown("3. 进入 API Keys 页面")
+            st.markdown("4. 点击 Create new secret key")
+            st.markdown("5. 复制密钥并粘贴到上方")
+        
+        if st.button("💾 保存API密钥配置", use_container_width=True):
+            # 保存到session state
+            st.session_state['youtube_api_key'] = youtube_key_input
+            st.session_state['openai_api_key'] = openai_key_input
+            
+            # 可选：保存到配置文件
+            try:
+                config_file = "config/api_keys.json"
+                os.makedirs(os.path.dirname(config_file), exist_ok=True)
+                
+                # 读取现有配置
+                apis = []
+                if os.path.exists(config_file):
+                    with open(config_file, 'r') as f:
+                        apis = json.load(f)
+                
+                # 更新或添加YouTube API
+                youtube_api_exists = False
+                for api in apis:
+                    if api.get('platform') == 'YouTube':
+                        api['api_key'] = youtube_key_input
+                        api['updated_at'] = datetime.now().isoformat()
+                        youtube_api_exists = True
+                        break
+                
+                if not youtube_api_exists and youtube_key_input:
+                    apis.append({
+                        'platform': 'YouTube',
+                        'name': 'YouTube Data API',
+                        'api_key': youtube_key_input,
+                        'url': 'https://www.googleapis.com/youtube/v3',
+                        'updated_at': datetime.now().isoformat()
+                    })
+                
+                # 保存配置
+                with open(config_file, 'w') as f:
+                    json.dump(apis, f, indent=2)
+                
+                st.success("✅ API密钥已保存")
+            except Exception as e:
+                st.warning(f"保存到配置文件失败: {e}")
+                st.info("密钥已保存到当前会话，刷新页面后需要重新输入")
+    
     # API密钥检查
-    youtube_api_key = os.getenv("YOUTUBE_API_KEY")
-    openai_api_key = os.getenv("OPENAI_API_KEY")
+    youtube_api_key = st.session_state.get('youtube_api_key', os.getenv("YOUTUBE_API_KEY"))
+    openai_api_key = st.session_state.get('openai_api_key', os.getenv("OPENAI_API_KEY"))
     
     col1, col2 = st.columns(2)
     with col1:
@@ -31,7 +115,7 @@ def render_youtube_query():
             st.success("✅ YouTube API已配置")
         else:
             st.warning("⚠️ YouTube API未配置")
-            st.info("请在.env文件中设置 YOUTUBE_API_KEY")
+            st.info("请点击上方'API密钥配置'设置您的API密钥")
     
     with col2:
         if openai_api_key:

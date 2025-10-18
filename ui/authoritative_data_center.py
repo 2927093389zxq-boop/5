@@ -26,7 +26,7 @@ def render_authoritative_data_center():
         sources = get_all_sources()
     
     # Create tabs for different views
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 数据可视化", "📋 详细数据", "🔍 数据源管理", "📥 数据采集"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 数据可视化", "📋 详细数据", "🔍 数据源管理", "📥 数据采集", "📜 政策中心"])
     
     with tab1:
         render_visualizations(trends, sources)
@@ -39,6 +39,9 @@ def render_authoritative_data_center():
     
     with tab4:
         render_data_collection()
+    
+    with tab5:
+        render_policy_center_integrated(sources)
 
 
 def render_visualizations(trends, sources):
@@ -672,3 +675,195 @@ def render_data_collection():
             # This would integrate with AI to search through saved files
             st.info(f"搜索功能开发中...关键词: {search_query}")
             st.caption("将使用AI分析PDF内容、文本和图片OCR结果进行智能搜索")
+
+
+def render_policy_center_integrated(sources):
+    """渲染政策中心（已集成到权威数据中心）"""
+    st.markdown("### 📜 政策中心")
+    st.info("展示来自权威数据中心的政策和行业资讯（已从独立模块整合到此处）")
+    
+    # 添加搜索和筛选功能
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        search_query = st.text_input(
+            "🔍 搜索政策",
+            placeholder="输入关键词搜索...",
+            key="policy_search",
+            label_visibility="collapsed"
+        )
+    
+    with col2:
+        sort_by = st.selectbox("排序", ["最新发布", "数据可信度", "机构名称"], key="policy_sort")
+    
+    with col3:
+        view_mode = st.selectbox("视图", ["卡片视图", "列表视图", "时间轴"], key="policy_view")
+    
+    st.markdown("---")
+    
+    try:
+        from core.collectors.policy_collector import fetch_latest_policies
+        
+        # 获取政策数据
+        policies = fetch_latest_policies()
+        
+        # 搜索过滤
+        if search_query:
+            policies = [
+                p for p in policies 
+                if search_query.lower() in str(p).lower()
+            ]
+        
+        # 排序
+        if sort_by == "最新发布":
+            policies = sorted(policies, key=lambda x: x.get('fetched_at', ''), reverse=True)
+        elif sort_by == "数据可信度":
+            policies = sorted(policies, key=lambda x: x.get('credibility', 0), reverse=True)
+        
+        if not policies:
+            st.info("暂无政策数据或未找到匹配结果")
+            return
+        
+        # 根据视图模式显示
+        if view_mode == "卡片视图":
+            # 卡片式展示（每行2个卡片）
+            for i in range(0, len(policies), 2):
+                cols = st.columns(2)
+                
+                for j, col in enumerate(cols):
+                    if i + j < len(policies):
+                        policy = policies[i + j]
+                        with col:
+                            render_policy_card_integrated(policy, sources, i + j + 1)
+        
+        elif view_mode == "列表视图":
+            # 列表式展示
+            for idx, policy in enumerate(policies, 1):
+                with st.container():
+                    col1, col2 = st.columns([1, 4])
+                    
+                    with col1:
+                        # 显示图标
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                    padding: 20px; 
+                                    border-radius: 10px; 
+                                    text-align: center;
+                                    color: white;
+                                    font-size: 20px;
+                                    font-weight: bold;">
+                            📜<br>{idx}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    with col2:
+                        source_info = policy.get('source', {})
+                        st.markdown(f"### {source_info.get('agency', '未知机构')}")
+                        st.markdown(f"**发布时间:** {policy.get('fetched_at', 'N/A')}")
+                        st.markdown(f"{policy.get('snippet', '暂无内容')}")
+                        
+                        # 显示相关数据源信息
+                        related_source = next((s for s in sources if source_info.get('agency', '') in s.get('name', '')), None)
+                        if related_source:
+                            st.caption(f"数据可信度: {related_source.get('credibility', 0):.0%}")
+                        
+                        # 添加操作按钮
+                        col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+                        with col_btn1:
+                            if st.button("📖 详情", key=f"policy_detail_{idx}"):
+                                st.session_state[f'show_policy_{idx}'] = True
+                        with col_btn2:
+                            if st.button("🔗 来源", key=f"policy_source_{idx}"):
+                                source_url = policy.get('url', '#')
+                                st.markdown(f"[查看原文]({source_url})")
+                
+                st.markdown("---")
+        
+        else:  # 时间轴视图
+            st.markdown("### 📅 政策发布时间轴")
+            
+            for idx, policy in enumerate(policies, 1):
+                # 时间轴样式
+                source_info = policy.get('source', {})
+                date = policy.get('fetched_at', 'N/A')[:10]
+                
+                st.markdown(f"""
+                <div style="border-left: 3px solid #667eea; 
+                            padding-left: 20px; 
+                            margin-left: 10px;
+                            margin-bottom: 30px;">
+                    <div style="color: #667eea; font-weight: bold; margin-bottom: 5px;">
+                        📅 {date}
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                        {source_info.get('agency', '未知机构')}
+                    </div>
+                    <div style="color: #666;">
+                        {policy.get('snippet', '暂无内容')[:200]}...
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if st.button("查看完整内容", key=f"policy_view_full_{idx}"):
+                    with st.expander(f"完整内容 - {source_info.get('agency', '未知机构')}", expanded=True):
+                        st.markdown(policy.get('snippet', '暂无内容'))
+                        st.caption(f"来源: {policy.get('url', 'N/A')}")
+        
+        st.markdown("---")
+        st.success("✅ 政策中心已集成到权威数据中心，实现统一数据管理")
+        
+    except Exception as e:
+        st.error(f"加载政策数据失败: {e}")
+
+
+def render_policy_card_integrated(policy: dict, sources: list, idx: int):
+    """渲染单个政策卡片（集成版本）"""
+    source_info = policy.get('source', {})
+    
+    # 卡片样式
+    st.markdown(f"""
+    <div style="border: 1px solid #e0e0e0; 
+                border-radius: 10px; 
+                padding: 20px; 
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+                height: 250px;
+                overflow: hidden;">
+        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-right: 10px;">
+                {idx}
+            </div>
+            <div>
+                <div style="font-size: 18px; font-weight: bold; color: #333;">
+                    {source_info.get('agency', '未知机构')[:30]}
+                </div>
+                <div style="font-size: 12px; color: #999;">
+                    {policy.get('fetched_at', 'N/A')[:10]}
+                </div>
+            </div>
+        </div>
+        <div style="color: #666; line-height: 1.6; height: 120px; overflow: hidden;">
+            {policy.get('snippet', '暂无内容')[:150]}...
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 添加按钮
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📖 查看详情", key=f"policy_card_detail_{idx}", use_container_width=True):
+            with st.expander(f"详细内容", expanded=True):
+                st.markdown(policy.get('snippet', '暂无内容'))
+    with col2:
+        if st.button("🔗 访问来源", key=f"policy_card_source_{idx}", use_container_width=True):
+            st.markdown(f"[打开原文链接]({policy.get('url', '#')})")
