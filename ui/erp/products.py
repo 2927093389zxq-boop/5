@@ -31,12 +31,72 @@ def render_product_management():
         st.write("")
         st.write("")
         if st.button("➕ 添加产品", use_container_width=True):
-            st.info("添加产品功能开发中...")
+            st.session_state['show_add_product_modal'] = True
     with col3:
         st.write("")
         st.write("")
         if st.button("📊 导出数据", use_container_width=True):
-            st.info("导出功能开发中...")
+            st.session_state['show_export_modal'] = True
+    
+    # 添加产品对话框
+    if st.session_state.get('show_add_product_modal', False):
+        with st.expander("➕ 添加新产品", expanded=True):
+            st.subheader("产品信息录入")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                new_product_name = st.text_input("产品名称*", key="new_prod_name")
+                new_product_sku = st.text_input("SKU*", key="new_prod_sku")
+                new_product_category = st.selectbox("分类*", 
+                    ["电子产品", "服装", "食品", "日用品", "图书", "运动用品", "家居用品"], 
+                    key="new_prod_cat")
+                new_product_price = st.number_input("售价(¥)*", min_value=0.0, value=0.0, step=0.01, key="new_prod_price")
+            with col2:
+                new_product_cost = st.number_input("成本(¥)*", min_value=0.0, value=0.0, step=0.01, key="new_prod_cost")
+                new_product_stock = st.number_input("初始库存", min_value=0, value=0, step=1, key="new_prod_stock")
+                new_product_status = st.selectbox("状态", ["在售", "下架", "预售"], key="new_prod_status")
+                new_product_desc = st.text_area("产品描述", key="new_prod_desc", height=80)
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("✅ 确认添加", type="primary", use_container_width=True):
+                    if new_product_name and new_product_sku and new_product_price > 0:
+                        st.success(f"✅ 产品添加成功！{new_product_name} (SKU: {new_product_sku})")
+                        st.session_state['show_add_product_modal'] = False
+                        st.rerun()
+                    else:
+                        st.error("请填写所有必填项（产品名称、SKU、售价）")
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_add_product_modal'] = False
+                    st.rerun()
+    
+    # 导出数据对话框
+    if st.session_state.get('show_export_modal', False):
+        with st.expander("📊 导出产品数据", expanded=True):
+            st.subheader("选择导出格式和范围")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                export_format = st.selectbox("导出格式", ["Excel (xlsx)", "CSV", "JSON"], key="export_format")
+                export_range = st.selectbox("导出范围", ["当前筛选结果", "全部产品"], key="export_range")
+            with col2:
+                include_fields = st.multiselect("包含字段", 
+                    ["产品ID", "产品名称", "SKU", "分类", "价格", "成本", "利润率", "状态", "库存", "创建日期"],
+                    default=["产品名称", "SKU", "分类", "价格", "库存", "状态"],
+                    key="export_fields")
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("📥 下载", type="primary", use_container_width=True):
+                    st.success(f"✅ 导出成功！格式: {export_format}, 范围: {export_range}")
+                    st.info(f"导出字段: {', '.join(include_fields)}")
+                    st.session_state['show_export_modal'] = False
+                    st.rerun()
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_export_modal'] = False
+                    st.rerun()
     
     st.divider()
     

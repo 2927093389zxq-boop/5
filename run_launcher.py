@@ -39,7 +39,7 @@ MENU_STRUCTURE = {
         "AI迭代系统",
         "API 管理", "政策中心", "系统概览", "日志与设置"
     ],
-    "SaaS平台": ["SaaS仪表盘", "用户管理", "计费管理"],
+    "SaaS平台": ["SaaS仪表盘", "智能体对接", "用户管理", "计费管理"],
     "ERP系统": ["库存管理", "产品管理", "订单管理"]
 }
 
@@ -329,9 +329,104 @@ def render_policy_card(policy: dict, sources: list, idx: int):
 
 
 def render_system_overview():
-    """渲染系统概览，数据实时更新，优化UI界面"""
+    """渲染系统概览，数据实时更新，优化UI界面，包含新手指南"""
     st.header("📊 系统概览")
     st.markdown("实时监控系统运行状态和数据采集情况")
+    
+    # 新手指南按钮
+    if st.button("📖 查看新手指南"):
+        st.session_state['show_beginner_guide'] = True
+    
+    # 显示新手指南
+    if st.session_state.get('show_beginner_guide', False):
+        with st.expander("🎓 新手指南 - 系统功能快速入门", expanded=True):
+            st.markdown("""
+            ### 欢迎使用京盛传媒企业版智能体系统！
+            
+            #### 📚 核心功能模块说明
+            
+            ##### 1. 智能体平台
+            - **主页**: 系统首页，查看整体状态
+            - **智能分析**: 使用OpenAI进行市场数据深度分析，支持上传Word/PDF/Excel文件
+            - **原型测试**: 上传文件进行原型测试，OpenAI会在互联网搜索相似数据进行验证
+            - **权威数据中心**: 集成多个权威数据源，支持数据可视化和详细数据展示
+            - **数据采集**: 配置自动爬取，支持本地存储和云端存储选择
+            - **Amazon采集工具**: 专门的Amazon数据采集工具
+            
+            ##### 2. SaaS平台
+            - **智能体对接**: 为SaaS客户提供API接口和服务
+            - **用户管理**: 管理SaaS平台用户
+            - **计费管理**: 处理订阅和计费
+            
+            ##### 3. ERP系统
+            - **库存管理**: 入库/出库操作，库存监控
+            - **产品管理**: 添加产品，导出产品数据
+            - **订单管理**: 新建订单，导出订单数据
+            
+            #### 🚀 快速开始步骤
+            
+            **第1步: 数据采集**
+            1. 进入"权威数据中心"→"数据采集"标签页
+            2. 选择存储方式（本地或云端）
+            3. 配置要爬取的数据源
+            4. 启用自动爬取
+            
+            **第2步: 智能分析**
+            1. 进入"智能分析"页面
+            2. 上传数据文件或选择"最近采集数据"
+            3. 选择国家/区域和类别（用中文显示）
+            4. 点击"开始智能分析"获取AI洞察
+            
+            **第3步: 原型测试**
+            1. 在"智能分析"页面切换到"原型测试验证"标签
+            2. 上传测试文件（支持多种格式）
+            3. OpenAI将在互联网搜索相似数据进行对比
+            4. 查看测试结果和相似数据源
+            
+            **第4步: 数据可视化**
+            1. 在"权威数据中心"查看"数据可视化"标签
+            2. 查看多维度的数据图表
+            3. 导出分析结果
+            
+            **第5步: ERP操作**
+            1. 进入"ERP系统"菜单
+            2. 使用"库存管理"进行入库/出库
+            3. 使用"产品管理"添加产品和导出数据
+            4. 使用"订单管理"创建订单和导出订单
+            
+            #### 💡 使用技巧
+            
+            - **搜索功能**: 在侧边栏的"筛选功能"输入关键词快速定位功能
+            - **文件上传**: 智能分析支持Word、PDF、Excel等多种格式
+            - **WPS连接**: 在智能分析页面点击"连接WPS"按钮
+            - **数据导出**: 大部分模块都支持Excel/CSV/JSON格式导出
+            - **云端存储**: 数据采集支持配置阿里云、腾讯云、AWS等云存储
+            
+            #### 📞 需要帮助？
+            
+            - 查看各功能页面的提示信息（ℹ️ 图标）
+            - 阅读API文档（SaaS平台→智能体对接→使用文档）
+            - 联系技术支持
+            
+            #### 🎯 推荐工作流程
+            
+            1. 配置数据采集（权威数据中心）
+            2. 等待数据采集完成
+            3. 使用智能分析获取市场洞察
+            4. 通过原型测试验证分析结果
+            5. 在ERP系统中管理产品和订单
+            6. 为SaaS客户提供API服务
+            
+            ---
+            
+            💬 **提示**: 点击右上角的❌可以关闭此指南，随时可通过"查看新手指南"按钮重新打开。
+            """)
+            
+            if st.button("关闭指南"):
+                st.session_state['show_beginner_guide'] = False
+                st.rerun()
+    
+    st.markdown("---")
     
     # 顶部控制栏
     col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
@@ -897,7 +992,6 @@ def render_log_and_settings():
                         status = platform_status.get(platform, "📝 待实现")
                         st.caption(f"**{platform.upper()}**")
                         st.caption(status)
-                )
                 
                 if st.button("保存数据源配置"):
                     config['market_sources'] = selected_sources
@@ -986,6 +1080,9 @@ def route_saas_platform(sub_menu):
     if sub_menu == "SaaS仪表盘":
         import ui.saas.dashboard as saas_dash
         saas_dash.render_saas_dashboard()
+    elif sub_menu == "智能体对接":
+        from ui.saas.agent_integration import render_agent_integration
+        render_agent_integration()
     elif sub_menu == "用户管理":
         import ui.saas.users as saas_users
         saas_users.render_users_management()

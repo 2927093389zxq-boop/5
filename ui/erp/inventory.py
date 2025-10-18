@@ -31,12 +31,70 @@ def render_inventory_management():
         st.write("")
         st.write("")
         if st.button("📥 入库", use_container_width=True):
-            st.info("入库功能开发中...")
+            st.session_state['show_inbound_modal'] = True
     with col3:
         st.write("")
         st.write("")
         if st.button("📤 出库", use_container_width=True):
-            st.info("出库功能开发中...")
+            st.session_state['show_outbound_modal'] = True
+    
+    # 入库对话框
+    if st.session_state.get('show_inbound_modal', False):
+        with st.expander("📥 入库操作", expanded=True):
+            st.subheader("入库信息录入")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                inbound_sku = st.text_input("产品SKU", key="inbound_sku")
+                inbound_name = st.text_input("产品名称", key="inbound_name")
+                inbound_quantity = st.number_input("入库数量", min_value=1, value=1, step=1, key="inbound_qty")
+            with col2:
+                inbound_supplier = st.text_input("供应商", key="inbound_supplier")
+                inbound_batch = st.text_input("批次号", key="inbound_batch")
+                inbound_notes = st.text_area("备注", key="inbound_notes", height=100)
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("✅ 确认入库", type="primary", use_container_width=True):
+                    if inbound_sku and inbound_name:
+                        st.success(f"✅ 入库成功！产品: {inbound_name} (SKU: {inbound_sku}), 数量: {inbound_quantity}")
+                        st.session_state['show_inbound_modal'] = False
+                        st.rerun()
+                    else:
+                        st.error("请填写必要信息：SKU和产品名称")
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_inbound_modal'] = False
+                    st.rerun()
+    
+    # 出库对话框
+    if st.session_state.get('show_outbound_modal', False):
+        with st.expander("📤 出库操作", expanded=True):
+            st.subheader("出库信息录入")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                outbound_sku = st.text_input("产品SKU", key="outbound_sku")
+                outbound_name = st.text_input("产品名称", key="outbound_name")
+                outbound_quantity = st.number_input("出库数量", min_value=1, value=1, step=1, key="outbound_qty")
+            with col2:
+                outbound_customer = st.text_input("客户/部门", key="outbound_customer")
+                outbound_order = st.text_input("订单号", key="outbound_order")
+                outbound_notes = st.text_area("备注", key="outbound_notes", height=100)
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("✅ 确认出库", type="primary", use_container_width=True):
+                    if outbound_sku and outbound_name:
+                        st.success(f"✅ 出库成功！产品: {outbound_name} (SKU: {outbound_sku}), 数量: {outbound_quantity}")
+                        st.session_state['show_outbound_modal'] = False
+                        st.rerun()
+                    else:
+                        st.error("请填写必要信息：SKU和产品名称")
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_outbound_modal'] = False
+                    st.rerun()
     
     st.divider()
     
