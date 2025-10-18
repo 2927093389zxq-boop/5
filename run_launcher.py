@@ -992,7 +992,6 @@ def render_log_and_settings():
                         status = platform_status.get(platform, "📝 待实现")
                         st.caption(f"**{platform.upper()}**")
                         st.caption(status)
-                )
                 
                 if st.button("保存数据源配置"):
                     config['market_sources'] = selected_sources
