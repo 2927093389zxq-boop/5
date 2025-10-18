@@ -115,11 +115,14 @@ def render_wps_login(wps: WPSIntegration):
         注意：需要先配置WPS应用凭证才能使用OAuth登录。
         """)
         
+        # 默认回调地址（在所有路径中定义）
+        default_redirect_uri = "http://localhost:8501"
+        
         if has_credentials:
             # 生成OAuth授权链接
             redirect_uri = st.text_input(
                 "回调地址",
-                value="http://localhost:8501",
+                value=default_redirect_uri,
                 help="应用的OAuth回调地址"
             )
             
@@ -144,7 +147,7 @@ def render_wps_login(wps: WPSIntegration):
                 
                 callback_uri = st.text_input(
                     "回调地址 (需与上方一致)",
-                    value=redirect_uri,
+                    value=redirect_uri if 'redirect_uri' in locals() else default_redirect_uri,
                     help="必须与授权链接中的redirect_uri一致"
                 )
                 
@@ -189,15 +192,19 @@ def render_wps_login(wps: WPSIntegration):
             st.success("✅ App Secret: ******** (已配置)")
         
         with st.form("wps_api_config_form"):
+            # 如果已有凭证，显示当前值（App ID显示前8位）
+            # 如果没有凭证，显示空白让用户输入
             app_id = st.text_input(
                 "WPS App ID",
-                value=wps.app_id if not has_credentials else "",
+                value=wps.app_id if has_credentials else "",
+                placeholder="输入WPS开放平台的App ID",
                 help="在WPS开放平台获取"
             )
             
             app_secret = st.text_input(
                 "WPS App Secret",
                 type="password",
+                placeholder="输入WPS开放平台的App Secret",
                 help="在WPS开放平台获取"
             )
             

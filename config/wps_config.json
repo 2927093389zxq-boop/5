@@ -1,7 +1,7 @@
 {
-  "username": "demo@example.com",
+  "username": "test@example.com",
   "authenticated": true,
-  "auth_time": "2025-10-18T20:29:17.614748",
+  "auth_time": "2025-10-18T20:29:56.938452",
   "documents": [
     {
       "doc_id": "doc_1760810520.904492",
@@ -30,6 +30,16 @@
       "creator": "demo@example.com",
       "url": "https://www.kdocs.cn/l/doc_1760819357.615257",
       "edit_url": "https://www.kdocs.cn/l/doc_1760819357.615257?mode=edit",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760819396.938723",
+      "title": "Test Document",
+      "type": "doc",
+      "created_at": "2025-10-18T20:29:56.938725",
+      "creator": "test@example.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819396.938723",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819396.938723?mode=edit",
       "demo_mode": true
     }
   ],
