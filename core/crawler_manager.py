@@ -60,11 +60,33 @@ class CrawlerManager:
             包含操作结果的字典
         """
         try:
+            # Validate crawler name to prevent path injection
+            # Only allow alphanumeric characters and underscores
+            if not name or not name.replace('_', '').isalnum():
+                return {
+                    'success': False,
+                    'message': '爬虫名称只能包含字母、数字和下划线',
+                    'error': 'Invalid crawler name'
+                }
+            
             # 验证代码是否可以编译
             compile(code, '<string>', 'exec')
             
-            # 保存代码到文件
-            crawler_file = os.path.join(self.storage_dir, f"{name}.py")
+            # 保存代码到文件 - 使用安全的路径构建
+            # Sanitize filename to prevent directory traversal
+            safe_name = os.path.basename(name)  # Remove any path components
+            crawler_file = os.path.join(self.storage_dir, f"{safe_name}.py")
+            
+            # Ensure the file path is within storage_dir
+            real_storage_dir = os.path.realpath(self.storage_dir)
+            real_crawler_file = os.path.realpath(crawler_file)
+            if not real_crawler_file.startswith(real_storage_dir):
+                return {
+                    'success': False,
+                    'message': '非法的文件路径',
+                    'error': 'Path traversal attempt detected'
+                }
+            
             with open(crawler_file, 'w', encoding='utf-8') as f:
                 f.write(code)
             

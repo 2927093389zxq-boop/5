@@ -90,6 +90,8 @@ def demo_wps_integration():
     wps = WPSIntegration()
     
     print("\n🔐 WPS账号认证...")
+    # NOTE: This is demo code with hardcoded credentials for demonstration purposes only
+    # In production, NEVER log or hardcode passwords - use secure credential management
     result = wps.authenticate("demo_user@example.com", "demo_password")
     print(f"   结果: {result['message']}")
     

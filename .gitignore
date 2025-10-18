@@ -59,6 +59,14 @@ data/models/*.pt
 # License and config (should not be committed to public repos)
 license.json
 
+# Enterprise features - sensitive data
+config/api_keys.json
+config/ai_models_config.json
+config/wps_config.json
+data/custom_crawlers/
+data/collaboration/
+temp_uploads/
+
 # Temporary files
 *.tmp
 *.temp
