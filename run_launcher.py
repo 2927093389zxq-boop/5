@@ -33,11 +33,10 @@ telemetry = None
 # 菜单配置（第 13 点：结构化 + 易扩展）
 MENU_STRUCTURE = {
     "智能体平台": [
-        "主页", "智能分析", "原型测试",
-        "权威数据中心", "数据来源追踪", "YouTube", "TikTok",
+        "主页", "智能分析", 
+        "权威数据中心", "YouTube", "TikTok",
         "Amazon采集工具", 
-        "AI迭代系统",
-        "API 管理", "政策中心", "系统概览", "日志与设置"
+        "API 管理", "系统概览", "日志与设置"
     ],
     "SaaS平台": ["SaaS仪表盘", "智能体对接", "用户管理", "计费管理"],
     "ERP系统": ["库存管理", "产品管理", "订单管理"]
@@ -346,12 +345,25 @@ def render_system_overview():
             #### 📚 核心功能模块说明
             
             ##### 1. 智能体平台
-            - **主页**: 系统首页，查看整体状态
-            - **智能分析**: 使用OpenAI进行市场数据深度分析，支持上传Word/PDF/Excel文件
-            - **原型测试**: 上传文件进行原型测试，OpenAI会在互联网搜索相似数据进行验证
-            - **权威数据中心**: 集成多个权威数据源，支持数据可视化和详细数据展示
-            - **数据采集**: 配置自动爬取，支持本地存储和云端存储选择
+            - **主页**: 系统首页，查看整体状态和跨平台热门产品看板
+            - **智能分析**: 使用OpenAI进行市场数据深度分析
+              - 支持上传Word/PDF/Excel文件进行分析
+              - 集成了原型测试验证功能
+              - 包含数据来源追踪与可信度验证
+              - 整合AI迭代与学习系统
+              - 提供数据爬取配置管理
+            - **权威数据中心**: 集成多个权威数据源
+              - 数据可视化和详细数据展示
+              - 数据源管理
+              - 数据采集配置
+              - 政策中心（整合）
+            - **YouTube**: YouTube频道深度分析，支持UI配置API密钥
+            - **TikTok**: TikTok数据分析
             - **Amazon采集工具**: 专门的Amazon数据采集工具
+            - **API管理**: 统一管理所有第三方API配置
+              - 支持OpenAI、Google、Amazon等平台
+              - 提供API密钥获取指南
+              - 解释API端点URL概念
             
             ##### 2. SaaS平台
             - **智能体对接**: 为SaaS客户提供API接口和服务
@@ -365,57 +377,77 @@ def render_system_overview():
             
             #### 🚀 快速开始步骤
             
-            **第1步: 数据采集**
-            1. 进入"权威数据中心"→"数据采集"标签页
-            2. 选择存储方式（本地或云端）
-            3. 配置要爬取的数据源
-            4. 启用自动爬取
+            **第1步: 配置API密钥**
+            1. 进入"API管理"页面
+            2. 添加OpenAI、YouTube等所需的API密钥
+            3. 查看获取指南了解如何获取各平台API
             
-            **第2步: 智能分析**
+            **第2步: 数据采集**
+            1. 进入"智能分析"→"数据爬取配置"标签
+            2. 选择要爬取的平台（Amazon、eBay等）
+            3. 设置爬取频率和参数
+            4. 启动爬虫开始采集数据
+            
+            **第3步: 智能分析**
             1. 进入"智能分析"页面
             2. 上传数据文件或选择"最近采集数据"
-            3. 选择国家/区域和类别（用中文显示）
+            3. 选择国家/区域和类别
             4. 点击"开始智能分析"获取AI洞察
             
-            **第3步: 原型测试**
+            **第4步: 数据来源验证**
+            1. 在"智能分析"页面切换到"数据来源追踪"标签
+            2. 查看所有数据源的可信度评分
+            3. 验证分析结果的数据来源
+            
+            **第5步: 原型测试**
             1. 在"智能分析"页面切换到"原型测试验证"标签
-            2. 上传测试文件（支持多种格式）
-            3. OpenAI将在互联网搜索相似数据进行对比
-            4. 查看测试结果和相似数据源
+            2. 上传测试文件
+            3. AI将搜索互联网相似数据进行对比验证
+            4. 查看验证结果和相似度分析
             
-            **第4步: 数据可视化**
-            1. 在"权威数据中心"查看"数据可视化"标签
-            2. 查看多维度的数据图表
-            3. 导出分析结果
-            
-            **第5步: ERP操作**
-            1. 进入"ERP系统"菜单
-            2. 使用"库存管理"进行入库/出库
-            3. 使用"产品管理"添加产品和导出数据
-            4. 使用"订单管理"创建订单和导出订单
+            **第6步: 查看权威数据**
+            1. 进入"权威数据中心"
+            2. 查看"数据可视化"了解市场趋势
+            3. 浏览"政策中心"了解行业政策
+            4. 管理自定义数据源
             
             #### 💡 使用技巧
             
             - **搜索功能**: 在侧边栏的"筛选功能"输入关键词快速定位功能
             - **文件上传**: 智能分析支持Word、PDF、Excel等多种格式
-            - **WPS连接**: 在智能分析页面点击"连接WPS"按钮
+            - **WPS连接**: 在智能分析页面点击"连接WPS"按钮实现在线协作
+            - **API配置**: 所有API密钥可在"API管理"中统一配置，无需修改代码
+            - **YouTube配置**: YouTube模块支持在UI界面直接设置API密钥
             - **数据导出**: 大部分模块都支持Excel/CSV/JSON格式导出
-            - **云端存储**: 数据采集支持配置阿里云、腾讯云、AWS等云存储
+            - **模块整合**: 原型测试、数据来源追踪、AI迭代系统已整合到智能分析中
+            - **政策查看**: 政策中心已整合到权威数据中心的独立标签页
             
             #### 📞 需要帮助？
             
             - 查看各功能页面的提示信息（ℹ️ 图标）
-            - 阅读API文档（SaaS平台→智能体对接→使用文档）
+            - 阅读API文档（API管理→查看各平台获取指南）
+            - 使用"筛选功能"快速找到所需功能
             - 联系技术支持
             
             #### 🎯 推荐工作流程
             
-            1. 配置数据采集（权威数据中心）
-            2. 等待数据采集完成
-            3. 使用智能分析获取市场洞察
-            4. 通过原型测试验证分析结果
-            5. 在ERP系统中管理产品和订单
-            6. 为SaaS客户提供API服务
+            1. **配置阶段**: 在API管理中配置所需的API密钥
+            2. **数据采集**: 使用智能分析的爬取配置功能采集数据
+            3. **智能分析**: 对采集的数据进行AI分析获取市场洞察
+            4. **验证分析**: 通过原型测试和数据来源追踪验证分析结果
+            5. **查看趋势**: 在权威数据中心查看整体市场趋势和政策
+            6. **业务管理**: 在ERP系统中管理产品和订单
+            7. **对外服务**: 为SaaS客户提供API服务
+            
+            #### 🆕 最新更新
+            
+            - ✅ 智能分析模块已整合原型测试、数据来源追踪、AI迭代系统
+            - ✅ 权威数据中心已整合政策中心
+            - ✅ YouTube模块支持UI配置API密钥
+            - ✅ API管理支持OpenAI和Google API
+            - ✅ 添加WPS在线文档连接功能
+            - ✅ 提供详细的API获取指南和端点URL说明
+            - ✅ 系统不包含AI生成的示例数据，所有数据由用户上传或爬取
             
             ---
             
@@ -1043,18 +1075,11 @@ def route_intelligent_platform(sub_menu):
     if sub_menu == "主页":
         render_dashboard()
     elif sub_menu == "系统概览":
-        st.header("系统概览")
-        st.metric("主机名", socket.gethostname())
-        st.metric("系统", platform.platform())
-        st.metric("时间", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        render_system_overview()
     elif sub_menu == "智能分析":
         render_analytics()
-    elif sub_menu == "原型测试":
-        render_prototype()
     elif sub_menu == "权威数据中心":
         render_authoritative_data_center()
-    elif sub_menu == "数据来源追踪":
-        render_sources()
     elif sub_menu == "YouTube":
         from ui.youtube_enhanced import render_youtube_query
         render_youtube_query()
@@ -1062,17 +1087,10 @@ def route_intelligent_platform(sub_menu):
         from ui.tiktok_enhanced import render_tiktok_module
         render_tiktok_module()
     elif sub_menu == "Amazon采集工具":
-        # 延迟导入，避免初始加载开销
-        import ui.amazon_crawl_options
-    elif sub_menu == "AI迭代系统":
-        from ui.ai_iteration_system import render_ai_iteration_system
-        render_ai_iteration_system()
+        from ui.amazon_crawl_options import render_amazon_crawl_tool
+        render_amazon_crawl_tool()
     elif sub_menu == "API 管理":
         render_api_admin()
-    elif sub_menu == "政策中心":
-        render_policy_center()
-    elif sub_menu == "系统概览":
-        render_system_overview()
     elif sub_menu == "日志与设置":
         render_log_and_settings()
 

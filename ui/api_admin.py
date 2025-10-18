@@ -106,7 +106,48 @@ def render_api_admin():
     
     with tab2:
         st.markdown("### ➕ 添加新API配置")
-        st.info("支持添加Amazon、TikTok、YouTube等平台的第三方API")
+        st.info("支持添加Amazon、TikTok、YouTube、OpenAI、Google等平台的第三方API")
+        
+        # API端点URL解释
+        with st.expander("❓ 什么是API端点URL？", expanded=False):
+            st.markdown("""
+            ### 📖 API端点URL说明
+            
+            **API端点（API Endpoint）**是指API服务器上的一个特定URL地址，用于接收和处理API请求。
+            
+            #### 📝 基本结构
+            ```
+            https://api.example.com/v1/resource
+            ├── https://          协议（通常是HTTPS）
+            ├── api.example.com   API服务器域名
+            ├── /v1/              API版本号
+            └── /resource         具体的资源路径
+            ```
+            
+            #### 💡 实际示例
+            
+            **OpenAI API:**
+            - 端点: `https://api.openai.com/v1/chat/completions`
+            - 用途: 调用ChatGPT进行对话
+            
+            **Google YouTube API:**
+            - 端点: `https://www.googleapis.com/youtube/v3/search`
+            - 用途: 搜索YouTube视频
+            
+            **Amazon Product API (第三方):**
+            - 端点: `https://api.rainforestapi.com/request`
+            - 用途: 获取Amazon产品数据
+            
+            #### 🎯 使用场景
+            - 不同的端点对应不同的功能
+            - 同一个API服务可能有多个端点
+            - 每个端点都需要正确的认证（API密钥）
+            
+            #### ⚠️ 注意事项
+            - API端点URL通常不能随意修改
+            - 必须使用API提供商文档中指定的准确URL
+            - 包含版本号（如/v1/、/v3/）的端点可能会随版本更新
+            """)
         
         with st.form(key="api_form", clear_on_submit=True):
             col1, col2 = st.columns(2)
@@ -114,27 +155,41 @@ def render_api_admin():
             with col1:
                 platform = st.selectbox(
                     "平台类型",
-                    ["Amazon", "TikTok", "YouTube", "Shopee", "eBay", "其他"],
+                    [
+                        "OpenAI", 
+                        "Google (YouTube/Search)", 
+                        "Amazon", 
+                        "TikTok", 
+                        "Shopee", 
+                        "eBay", 
+                        "其他"
+                    ],
                     help="选择API所属平台"
                 )
                 
                 name = st.text_input(
                     "API名称",
-                    placeholder="例如：Amazon Product API",
+                    placeholder="例如：OpenAI GPT-4 API",
                     help="为API起一个易识别的名称"
                 )
                 
                 url = st.text_input(
                     "API端点URL",
-                    placeholder="https://api.example.com/endpoint",
-                    help="API的完整URL地址"
+                    placeholder="https://api.openai.com/v1/chat/completions",
+                    help="API的完整URL地址（端点）"
                 )
+                
+                # 根据选择的平台显示提示信息
+                if platform == "OpenAI":
+                    st.info("💡 OpenAI常用端点: https://api.openai.com/v1/chat/completions")
+                elif platform == "Google (YouTube/Search)":
+                    st.info("💡 YouTube Data API: https://www.googleapis.com/youtube/v3/")
             
             with col2:
                 api_key = st.text_input(
                     "API密钥",
                     type="password",
-                    placeholder="输入API密钥",
+                    placeholder="sk-... (OpenAI) 或 AIza... (Google)",
                     help="从API提供商获取的密钥"
                 )
                 
@@ -143,6 +198,31 @@ def render_api_admin():
                     placeholder="描述此API的用途和注意事项",
                     height=100
                 )
+                
+                # 显示获取API密钥的链接
+                st.markdown("**📚 如何获取API密钥:**")
+                if platform == "OpenAI":
+                    st.markdown("1. 访问 [OpenAI平台](https://platform.openai.com/)")
+                    st.markdown("2. 注册并登录账号")
+                    st.markdown("3. 进入 [API Keys 页面](https://platform.openai.com/api-keys)")
+                    st.markdown("4. 点击 'Create new secret key'")
+                    st.markdown("5. 复制密钥（只显示一次）")
+                elif platform == "Google (YouTube/Search)":
+                    st.markdown("1. 访问 [Google Cloud Console](https://console.cloud.google.com/)")
+                    st.markdown("2. 创建新项目")
+                    st.markdown("3. 启用所需API（YouTube Data API v3）")
+                    st.markdown("4. 创建凭据 → API密钥")
+                    st.markdown("5. 复制API密钥")
+                elif platform == "Amazon":
+                    st.markdown("**推荐第三方API服务:**")
+                    st.markdown("- [Rainforest API](https://www.rainforestapi.com/)")
+                    st.markdown("- [ScraperAPI](https://www.scraperapi.com/)")
+                    st.markdown("- [RapidAPI Amazon](https://rapidapi.com/)")
+                elif platform == "TikTok":
+                    st.markdown("1. 访问 [TikTok开发者平台](https://developers.tiktok.com/)")
+                    st.markdown("2. 注册开发者账号")
+                    st.markdown("3. 创建应用")
+                    st.markdown("4. 获取Client Key和Secret")
             
             # 高级选项
             with st.expander("⚙️ 高级选项"):
