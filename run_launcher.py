@@ -36,7 +36,8 @@ MENU_STRUCTURE = {
         "主页", "智能分析", 
         "权威数据中心", "YouTube", "TikTok",
         "Amazon采集工具", 
-        "API 管理", "系统概览", "日志与设置"
+        "爬虫管理", "WPS协作",
+        "API 管理", "企业协作", "系统概览", "日志与设置"
     ],
     "SaaS平台": ["SaaS仪表盘", "智能体对接", "用户管理", "计费管理"],
     "ERP系统": ["库存管理", "产品管理", "订单管理"]
@@ -1089,8 +1090,17 @@ def route_intelligent_platform(sub_menu):
     elif sub_menu == "Amazon采集工具":
         from ui.amazon_crawl_options import render_amazon_crawl_tool
         render_amazon_crawl_tool()
+    elif sub_menu == "爬虫管理":
+        from ui.crawler_management import render_crawler_management
+        render_crawler_management()
+    elif sub_menu == "WPS协作":
+        from ui.wps_integration import render_wps_integration
+        render_wps_integration()
     elif sub_menu == "API 管理":
         render_api_admin()
+    elif sub_menu == "企业协作":
+        from ui.enterprise_collaboration import render_enterprise_collaboration
+        render_enterprise_collaboration()
     elif sub_menu == "日志与设置":
         render_log_and_settings()
 
