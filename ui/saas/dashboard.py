@@ -35,7 +35,7 @@ def render_saas_dashboard():
     dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(30, 0, -1)]
     
     # 模拟销售数据
-    random.seed(hash(store.store_id))
+    random.seed(hash(store_data["name"]))
     sales = [random.randint(1000, 5000) for _ in range(30)]
     orders = [random.randint(10, 50) for _ in range(30)]
     

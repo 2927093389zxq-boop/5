@@ -143,6 +143,202 @@ class WPSIntegration:
         
         query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
         return f"{auth_url}?{query_string}"
+        
+    def get_token(self, code: str, redirect_uri: str = "http://localhost:8501") -> Dict[str, Any]:
+        """
+        通过授权码获取访问令牌
+        
+        Args:
+            code: 授权码
+            redirect_uri: 回调地址，必须与请求授权时使用的地址一致
+            
+        Returns:
+            令牌信息
+        """
+        try:
+            app_id = self.config.get('app_id', '')
+            app_secret = self.config.get('app_secret', '')
+            
+            if not app_id or not app_secret:
+                return {
+                    'success': False,
+                    'message': 'WPS应用配置不完整，请先配置App ID和App Secret'
+                }
+            
+            # 请求访问令牌
+            token_url = f"{self.API_BASE_URL}/oauth/token"
+            data = {
+                'grant_type': 'authorization_code',
+                'code': code,
+                'appid': app_id,
+                'app_secret': app_secret,
+                'redirect_uri': redirect_uri
+            }
+            
+            # 实际应用中应该使用requests.post发送请求
+            # response = self.session.post(token_url, data=data)
+            # token_info = response.json()
+            
+            # 模拟获取令牌
+            token_info = {
+                'access_token': f"wps_access_token_{datetime.now().timestamp()}",
+                'refresh_token': f"wps_refresh_token_{datetime.now().timestamp()}",
+                'expires_in': 7200,  # 2小时有效期
+                'token_type': 'Bearer'
+            }
+            
+            # 保存令牌信息
+            self.config['access_token'] = token_info['access_token']
+            self.config['refresh_token'] = token_info['refresh_token']
+            self.config['token_expires_at'] = datetime.now().timestamp() + token_info['expires_in']
+            self.config['authenticated'] = True
+            self.config['auth_time'] = datetime.now().isoformat()
+            
+            self.access_token = token_info['access_token']
+            self._save_config()
+            
+            return {
+                'success': True,
+                'message': '成功获取访问令牌',
+                'token': token_info
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'获取访问令牌失败: {str(e)}',
+                'error': str(e)
+            }
+            
+    def refresh_token(self) -> Dict[str, Any]:
+        """
+        刷新访问令牌
+        
+        Returns:
+            新的令牌信息
+        """
+        try:
+            refresh_token = self.config.get('refresh_token', '')
+            app_id = self.config.get('app_id', '')
+            app_secret = self.config.get('app_secret', '')
+            
+            if not refresh_token or not app_id or not app_secret:
+                return {
+                    'success': False,
+                    'message': '缺少刷新令牌或应用配置'
+                }
+            
+            # 请求刷新令牌
+            refresh_url = f"{self.API_BASE_URL}/oauth/token"
+            data = {
+                'grant_type': 'refresh_token',
+                'refresh_token': refresh_token,
+                'appid': app_id,
+                'app_secret': app_secret
+            }
+            
+            # 实际应用中应该使用requests.post发送请求
+            # response = self.session.post(refresh_url, data=data)
+            # token_info = response.json()
+            
+            # 模拟刷新令牌
+            token_info = {
+                'access_token': f"wps_access_token_{datetime.now().timestamp()}",
+                'refresh_token': f"wps_refresh_token_{datetime.now().timestamp()}",
+                'expires_in': 7200,
+                'token_type': 'Bearer'
+            }
+            
+            # 更新令牌信息
+            self.config['access_token'] = token_info['access_token']
+            self.config['refresh_token'] = token_info['refresh_token']
+            self.config['token_expires_at'] = datetime.now().timestamp() + token_info['expires_in']
+            
+            self.access_token = token_info['access_token']
+            self._save_config()
+            
+            return {
+                'success': True,
+                'message': '成功刷新访问令牌',
+                'token': token_info
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'刷新访问令牌失败: {str(e)}',
+                'error': str(e)
+            }
+            
+    def check_token_validity(self) -> bool:
+        """
+        检查访问令牌是否有效
+        
+        Returns:
+            令牌是否有效
+        """
+        # 检查是否有访问令牌
+        if not self.config.get('access_token'):
+            return False
+        
+        # 检查令牌是否过期
+        expires_at = self.config.get('token_expires_at', 0)
+        if datetime.now().timestamp() >= expires_at:
+            # 尝试刷新令牌
+            refresh_result = self.refresh_token()
+            return refresh_result.get('success', False)
+        
+        return True
+        
+    def authenticate(self, username: str, password: str) -> Dict[str, Any]:
+        """
+        WPS用户认证
+        
+        注意：在实际生产环境中，应使用OAuth2.0流程，而不是直接的账号密码认证
+        
+        Args:
+            username: 用户名
+            password: 密码
+            
+        Returns:
+            认证结果
+        """
+        try:
+            # 这里是简化的认证过程
+            # 实际应用中应引导用户通过OAuth2.0流程进行认证
+            
+            if not username or not password:
+                return {
+                    'success': False,
+                    'message': '用户名或密码不能为空'
+                }
+            
+            # 保存用户信息
+            self.config['username'] = username
+            self.config['authenticated'] = True
+            self.config['auth_time'] = datetime.now().isoformat()
+            
+            # 生成模拟令牌
+            self.access_token = f"mock_token_{username}_{datetime.now().timestamp()}"
+            self.config['access_token'] = self.access_token
+            self.config['token_expires_at'] = datetime.now().timestamp() + 7200  # 2小时有效期
+            
+            self._save_config()
+            
+            return {
+                'success': True,
+                'message': 'WPS认证成功',
+                'username': username,
+                'access_token': self.access_token,
+                'warning': '注意：这是演示认证，生产环境应使用OAuth2.0'
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'认证失败: {str(e)}',
+                'error': str(e)
+            }
     
     def get_user_info(self) -> Dict[str, Any]:
         """

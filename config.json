@@ -7,7 +7,12 @@
     "smtp_port": 465
   },
   "report_time": "08:00",
-  "market_sources": ["amazon", "etsy", "tiktok", "youtube"],
+  "market_sources": [
+    "amazon",
+    "etsy",
+    "tiktok",
+    "youtube"
+  ],
   "confidence_threshold": 0.7,
   "poll_interval_minutes": 60,
   "evolution_check_interval_hours": 2

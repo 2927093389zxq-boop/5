@@ -24,3 +24,8 @@ python-multipart
 playwright
 jieba
 wordcloud
+pytesseract
+Pillow
+PyPDF2
+python-docx
+openpyxl

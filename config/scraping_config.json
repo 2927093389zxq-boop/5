@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "interval": "每小时",
+  "sources": [
+    "联合国贸易和发展会议 (UNCTAD)",
+    "经济合作与发展组织 (OECD)",
+    "世界海关组织 (World Customs Organization)",
+    "Precedence Research",
+    "eCommerceDB",
+    "Statista"
+  ],
+  "dedupe_method": "基于标题+时间",
+  "storage": {
+    "type": "local",
+    "path": "data/authoritative_sources"
+  },
+  "last_updated": "2025-10-19T04:35:17.703959"
+}

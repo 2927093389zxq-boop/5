@@ -34,8 +34,13 @@ def render_wps_login(wps: WPSIntegration):
     """渲染WPS登录界面"""
     st.markdown("### 🔐 连接WPS账号")
     
-    # 提供两种登录方式的说明
-    tab1, tab2 = st.tabs(["账号密码登录", "API密钥配置"])
+    # 检查URL参数中是否有授权码
+    query_params = st.query_params
+    if 'code' in query_params:
+        handle_oauth_callback(wps, query_params['code'][0])
+    
+    # 提供三种登录方式
+    tab1, tab2, tab3 = st.tabs(["账号密码登录", "OAuth认证", "API密钥配置"])
     
     with tab1:
         st.info("""
@@ -47,7 +52,7 @@ def render_wps_login(wps: WPSIntegration):
         - 👥 与团队成员协作
         - 🔗 生成分享链接
         
-        注意：这是一个演示版本，实际生产环境需要接入WPS官方OAuth认证。
+        注意：这是演示登录方式，生产环境推荐使用OAuth认证。
         """)
         
         with st.form("wps_login_form"):
@@ -76,6 +81,8 @@ def render_wps_login(wps: WPSIntegration):
                     
                     if result['success']:
                         st.success(f"✅ {result['message']}")
+                        if 'warning' in result:
+                            st.warning(result['warning'])
                         st.balloons()
                         st.rerun()
                     else:
@@ -83,23 +90,64 @@ def render_wps_login(wps: WPSIntegration):
     
     with tab2:
         st.info("""
+        **OAuth认证（推荐用于生产环境）**
+        
+        安全的OAuth2.0认证流程：
+        1. 点击下方按钮跳转到WPS授权页面
+        2. 在WPS页面登录并授权
+        3. 授权成功后自动返回此应用
+        4. 系统自动完成认证过程
+        
+        优势：
+        - 🔒 更安全，无需在应用中存储密码
+        - 📋 符合OAuth2.0标准
+        - 🔄 支持令牌自动刷新
+        """)
+        
+        # 获取当前配置的应用信息
+        config = wps.config
+        app_id = config.get('app_id', '')
+        
+        if not app_id:
+            st.warning("⚠️ 请先在'API密钥配置'标签页中设置App ID和App Secret")
+            if st.button("前往配置API密钥", use_container_width=True):
+                # 这里无法直接切换标签，但可以给用户提示
+                st.info("请点击上方的'API密钥配置'标签进行设置")
+        else:
+            # 生成OAuth认证URL
+            # 使用当前Streamlit应用的URL作为回调地址
+            redirect_uri = f"http://localhost:8505"
+            auth_url = wps.get_auth_url(redirect_uri)
+            
+            if auth_url:
+                st.markdown(f"### [🚀 开始OAuth认证]({auth_url})")
+                st.markdown("---")
+                st.info("点击上方按钮后，会跳转到WPS授权页面，请在那里完成登录和授权操作。")
+            else:
+                st.error("无法生成OAuth认证链接，请检查API配置")
+    
+    with tab3:
+        st.info("""
         **使用WPS开放平台API**
         
-        如果您有WPS开放平台的应用凭证，可以在此配置：
+        配置WPS开放平台的应用凭证：
         1. 访问 [WPS开放平台](https://open.wps.cn/)
         2. 注册并创建应用
-        3. 获取 AppID 和 AppSecret
-        4. 在下方填入凭证信息
+        3. 设置回调地址为：`http://localhost:8505`
+        4. 获取 AppID 和 AppSecret
+        5. 在下方填入凭证信息
         """)
         
         with st.form("wps_api_config_form"):
             app_id = st.text_input(
                 "WPS App ID",
+                value=wps.config.get('app_id', ''),
                 help="在WPS开放平台获取"
             )
             
             app_secret = st.text_input(
                 "WPS App Secret",
+                value=wps.config.get('app_secret', ''),
                 type="password",
                 help="在WPS开放平台获取"
             )
@@ -114,17 +162,57 @@ def render_wps_login(wps: WPSIntegration):
                         app_secret=app_secret
                     )
                     st.success("✅ API配置已保存")
-                    
-                    # 显示OAuth认证链接
-                    auth_url = wps.get_auth_url()
-                    if auth_url:
-                        st.markdown(f"[点击此处进行OAuth认证]({auth_url})")
+                    st.info("请切换到'OAuth认证'标签页完成授权")
                 else:
                     st.warning("请填写完整的API凭证")
+                    
+
+def handle_oauth_callback(wps: WPSIntegration, code: str):
+    """
+    处理OAuth认证回调
+    
+    Args:
+        wps: WPSIntegration实例
+        code: 授权码
+    """
+    st.markdown("---")
+    st.subheader("🔄 正在处理OAuth认证...")
+    
+    with st.spinner("正在获取访问令牌..."):
+        # 使用与请求授权时相同的回调地址
+        redirect_uri = f"http://localhost:8505"
+        result = wps.get_token(code, redirect_uri)
+    
+    if result['success']:
+        st.success("✅ OAuth认证成功！")
+        st.info(f"已获取访问令牌，有效期2小时")
+        
+        # 清除URL中的授权码，避免重复处理
+        st.query_params.clear()
+        
+        # 延迟后刷新页面
+        import time
+        time.sleep(1)
+        st.rerun()
+    else:
+        st.error(f"❌ OAuth认证失败: {result['message']}")
+        st.info("请重新尝试OAuth认证流程")
+        
+        # 清除URL中的授权码
+        st.query_params.clear()
 
 
 def render_wps_workspace(wps: WPSIntegration, user_info: dict):
     """渲染WPS工作空间"""
+    
+    # 检查令牌有效性
+    token_valid = wps.check_token_validity()
+    if not token_valid:
+        st.error("❌ 访问令牌已失效，请重新登录")
+        if st.button("🔄 重新登录", use_container_width=True):
+            result = wps.logout()
+            st.rerun()
+        return
     
     # 顶部用户信息和登出按钮
     col1, col2 = st.columns([4, 1])
@@ -132,6 +220,21 @@ def render_wps_workspace(wps: WPSIntegration, user_info: dict):
     with col1:
         user = user_info.get('user', {})
         st.success(f"✅ 已连接WPS账号: **{user.get('username', 'N/A')}**")
+        
+        # 显示令牌状态信息
+        config = wps.config
+        if 'token_expires_at' in config:
+            expires_at = config['token_expires_at']
+            now = datetime.now().timestamp()
+            remaining_time = expires_at - now
+            
+            if remaining_time > 0:
+                hours, remainder = divmod(remaining_time, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                st.info(f"🔐 访问令牌有效期还剩: {int(hours)}小时{int(minutes)}分钟")
+            else:
+                st.warning("⚠️ 访问令牌已过期，正在尝试刷新...")
+                wps.check_token_validity()
     
     with col2:
         if st.button("🚪 登出", use_container_width=True):

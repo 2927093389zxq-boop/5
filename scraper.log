@@ -207,3 +207,128 @@ NotImplementedError
 2025-10-17 19:20:38,790 - scrapers - INFO - [tiktokshop] 数据已保存 / Data saved: data/tiktokshop/example_tiktokshop.json
 2025-10-17 19:40:18,751 - scrapers - INFO - 警报阈值已更新: error_rate = 0.3
 2025-10-17 22:30:56,424 - core.smart_analysis - WARNING - OPENAI_API_KEY not configured
+2025-10-19 04:23:01,176 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:23:01,180 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:23:01,180 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:23:01,181 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:23:01,182 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:23:01,183 - apscheduler.scheduler - INFO - Added job "job_collect" to job store "default"
+2025-10-19 04:23:01,183 - apscheduler.scheduler - INFO - Added job "job_daily_report" to job store "default"
+2025-10-19 04:23:01,183 - apscheduler.scheduler - INFO - Added job "job_evolution_check" to job store "default"
+2025-10-19 04:23:01,184 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:23:01,184 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:23:01,184 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-19 04:23:01,185 - scrapers - INFO - [Scheduler] 已启动
+2025-10-19 04:23:32,459 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 04:23:32,460 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:23:34,987 - scrapers - INFO - [LIST_TIME] secs=2.53
+2025-10-19 04:23:35,151 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 04:23:35,151 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 04:23:35,151 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 04:30:17,406 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:30:17,410 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:30:17,410 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:30:17,411 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:30:17,411 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:30:17,412 - apscheduler.scheduler - INFO - Added job "job_collect" to job store "default"
+2025-10-19 04:30:17,413 - apscheduler.scheduler - INFO - Added job "job_daily_report" to job store "default"
+2025-10-19 04:30:17,413 - apscheduler.scheduler - INFO - Added job "job_evolution_check" to job store "default"
+2025-10-19 04:30:17,413 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:30:17,413 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:30:17,415 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-19 04:30:17,416 - scrapers - INFO - [Scheduler] 已启动
+2025-10-19 04:30:25,200 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 04:30:25,200 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:30:27,595 - scrapers - INFO - [LIST_TIME] secs=2.40
+2025-10-19 04:30:27,697 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 04:30:27,698 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 04:30:27,698 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 04:30:37,591 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 04:30:37,592 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:30:40,037 - scrapers - INFO - [LIST_TIME] secs=2.45
+2025-10-19 04:30:40,145 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 04:30:40,147 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 04:30:40,147 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 04:34:39,679 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:02,160 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:06,510 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:09,027 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:09,987 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:13,990 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:35:17,441 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 04:46:14,807 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:46:14,811 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:46:14,811 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:46:14,812 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:46:14,812 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 04:46:14,814 - apscheduler.scheduler - INFO - Added job "job_collect" to job store "default"
+2025-10-19 04:46:14,814 - apscheduler.scheduler - INFO - Added job "job_daily_report" to job store "default"
+2025-10-19 04:46:14,814 - apscheduler.scheduler - INFO - Added job "job_evolution_check" to job store "default"
+2025-10-19 04:46:14,814 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:46:14,814 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 04:46:14,815 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-19 04:46:14,816 - scrapers - INFO - [Scheduler] 已启动
+2025-10-19 04:46:25,694 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 04:46:25,694 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:46:28,152 - scrapers - INFO - [LIST_TIME] secs=2.46
+2025-10-19 04:46:28,274 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 04:46:28,274 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 04:46:28,275 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 04:51:46,065 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 04:51:46,066 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:51:47,251 - scrapers - INFO - [LIST_TIME] secs=1.18
+2025-10-19 04:51:47,252 - scrapers - ERROR - [ERROR] 请求失败 / Request failed: https://www.amazon.com/bestsellers - 429 Client Error: Too Many Requests for url: https://www.amazon.com/bestsellers
+2025-10-19 04:51:48,860 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 04:51:50,129 - scrapers - INFO - [LIST_TIME] secs=1.27
+2025-10-19 04:51:50,224 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 04:51:50,225 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 04:51:50,225 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 05:30:17,439 - apscheduler.executors.default - INFO - Running job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 05:30:17 CST)" (scheduled at 2025-10-19 05:30:17.406238+08:00)
+2025-10-19 05:30:17,439 - scrapers - INFO - [Job] 采集市场权威数据
+2025-10-19 05:30:17,439 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 05:30:17,440 - scrapers - INFO - [Job] Trends count=6
+2025-10-19 05:30:17,440 - apscheduler.executors.default - INFO - Job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 06:30:17 CST)" executed successfully
+2025-10-19 05:46:14,833 - apscheduler.executors.default - INFO - Running job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 05:46:14 CST)" (scheduled at 2025-10-19 05:46:14.807383+08:00)
+2025-10-19 05:46:14,834 - scrapers - INFO - [Job] 采集市场权威数据
+2025-10-19 05:46:14,834 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 05:46:14,834 - scrapers - INFO - [Job] Trends count=6
+2025-10-19 05:46:14,835 - apscheduler.executors.default - INFO - Job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 06:46:14 CST)" executed successfully
+2025-10-19 05:50:57,443 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 05:50:57,450 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 05:50:57,450 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 05:50:57,451 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 05:50:57,451 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-19 05:50:57,455 - apscheduler.scheduler - INFO - Added job "job_collect" to job store "default"
+2025-10-19 05:50:57,456 - apscheduler.scheduler - INFO - Added job "job_daily_report" to job store "default"
+2025-10-19 05:50:57,456 - apscheduler.scheduler - INFO - Added job "job_evolution_check" to job store "default"
+2025-10-19 05:50:57,457 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 05:50:57,457 - apscheduler.scheduler - INFO - Added job "job_self_learn" to job store "default"
+2025-10-19 05:50:57,458 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-19 05:50:57,459 - scrapers - INFO - [Scheduler] 已启动
+2025-10-19 06:30:17,429 - apscheduler.executors.default - INFO - Running job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 07:30:17 CST)" (scheduled at 2025-10-19 06:30:17.406238+08:00)
+2025-10-19 06:30:17,429 - apscheduler.executors.default - INFO - Running job "job_evolution_check (trigger: interval[2:00:00], next run at: 2025-10-19 08:30:17 CST)" (scheduled at 2025-10-19 06:30:17.410810+08:00)
+2025-10-19 06:30:17,429 - scrapers - INFO - [Job] 采集市场权威数据
+2025-10-19 06:30:17,429 - scrapers - INFO - [Job] 自我演化检查
+2025-10-19 06:30:17,429 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 06:30:17,429 - scrapers - INFO - [Job] Trends count=6
+2025-10-19 06:30:17,429 - scrapers - INFO - [Job] 演化建议已生成，补丁: None
+2025-10-19 06:30:17,431 - apscheduler.executors.default - INFO - Job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 07:30:17 CST)" executed successfully
+2025-10-19 06:30:17,431 - apscheduler.executors.default - INFO - Job "job_evolution_check (trigger: interval[2:00:00], next run at: 2025-10-19 08:30:17 CST)" executed successfully
+2025-10-19 06:50:57,476 - apscheduler.executors.default - INFO - Running job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 06:50:57 CST)" (scheduled at 2025-10-19 06:50:57.442528+08:00)
+2025-10-19 06:50:57,476 - scrapers - INFO - [Job] 采集市场权威数据
+2025-10-19 06:50:57,477 - core.collectors.market_collector - INFO - Fetched 6 trend records from authoritative sources
+2025-10-19 06:50:57,477 - scrapers - INFO - [Job] Trends count=6
+2025-10-19 06:50:57,478 - apscheduler.executors.default - INFO - Job "job_collect (trigger: interval[1:00:00], next run at: 2025-10-19 07:50:57 CST)" executed successfully
+2025-10-19 07:05:19,395 - scrapers - INFO - 开始采集列表页 / Starting list page scraping: https://www.amazon.com/bestsellers
+2025-10-19 07:05:19,396 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 07:05:20,687 - scrapers - INFO - [LIST_TIME] secs=1.29
+2025-10-19 07:05:20,687 - scrapers - ERROR - [ERROR] 请求失败 / Request failed: https://www.amazon.com/bestsellers - 429 Client Error: Too Many Requests for url: https://www.amazon.com/bestsellers
+2025-10-19 07:05:22,647 - scrapers - INFO - 正在获取页面 / Fetching page: https://www.amazon.com/bestsellers
+2025-10-19 07:05:24,017 - scrapers - INFO - [LIST_TIME] secs=1.37
+2025-10-19 07:05:24,126 - scrapers - INFO - 使用选择器找到 36 个商品 / Found 36 items with selector: div.p13n-sc-uncoverable-faceout
+2025-10-19 07:05:24,127 - scrapers - INFO - 列表页采集完成，共 0 个商品 / List page scraping completed, 0 products
+2025-10-19 07:05:24,127 - scrapers - WARNING - 零结果页面 / Zero result page: https://www.amazon.com/bestsellers
+2025-10-19 07:05:38,191 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-19 07:05:38,193 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-19 07:05:40,281 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-19 07:05:40,283 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.

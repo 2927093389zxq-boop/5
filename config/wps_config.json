@@ -1,7 +1,7 @@
 {
-  "username": "test",
-  "authenticated": true,
-  "auth_time": "2025-10-18T18:09:49.655283",
+  "username": "2927093389",
+  "authenticated": false,
+  "auth_time": null,
   "documents": [
     {
       "doc_id": "doc_1760810520.904492",
@@ -12,5 +12,7 @@
       "url": "https://www.kdocs.cn/l/doc_1760810520.904492",
       "edit_url": "https://www.kdocs.cn/l/doc_1760810520.904492?mode=edit"
     }
-  ]
+  ],
+  "access_token": "mock_token_2927093389_1760821609.221594",
+  "token_expires_at": 1760828809.221594
 }

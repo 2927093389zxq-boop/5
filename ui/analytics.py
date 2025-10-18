@@ -1,9 +1,14 @@
+import sys
+import os
+
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import json
-import os
 from core.processing.anomaly_detector import detect_anomalies
 from core.collectors.market_collector import fetch_all_trends, get_all_sources
 from core.smart_analysis import SmartAnalysisEngine, analyze_product_data
@@ -615,8 +620,8 @@ def render_analytics():
 
     
     with tab3:
-        st.markdown("#### 权威数据来源验证")
-        sources = get_all_sources()
+        st.markdown("#### 🔍 数据来源追踪与验证")
+        st.info("展示当前权威数据来源、抓取时间与可信度综合评分")
         
         # Display sources in a more structured way
         col1, col2 = st.columns([2, 1])
@@ -898,12 +903,12 @@ def render_analytics():
         st.markdown("---")
         st.success("✅ 原型测试模块已集成到智能分析中，用于验证AI分析的正确性和逻辑性")
     
-    # Tab 5: Data Source Tracking (integrated from source_attribution.py)
-    with tab3:
-        st.markdown("#### 🔍 数据来源追踪与验证")
-        st.info("展示当前权威数据来源、抓取时间与可信度综合评分")
+    # Tab 5: AI Iteration and Learning (integrated from ai_iteration_system.py)
+    with tab5:
+        st.markdown("#### 🤖 AI迭代与学习系统")
+        st.info("整合AI学习、自主迭代和自动修复功能的统一系统")
         
-        if st.button("🔄 刷新数据源", key="refresh_sources"):
+        if st.button("🔄 刷新数据源", key="refresh_sources_tab5"):
             st.rerun()
         
         with st.spinner("获取权威数据节点..."):

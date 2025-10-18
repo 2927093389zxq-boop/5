@@ -6,7 +6,9 @@ SaaS平台智能体系统对接模块
 import streamlit as st
 import json
 import os
-from datetime import datetime
+import secrets
+import hashlib
+from datetime import datetime, timedelta
 import pandas as pd
 
 
@@ -44,6 +46,54 @@ def render_agent_integration():
         render_api_documentation()
 
 
+def generate_api_key():
+    """生成安全的API密钥"""
+    # 生成随机字节
+    random_bytes = secrets.token_bytes(32)
+    # 转换为十六进制字符串
+    api_key = "sk-" + hashlib.sha256(random_bytes).hexdigest()
+    return api_key
+
+def get_current_api_key():
+    """从配置文件获取当前API密钥"""
+    config_path = "config/saas/agent_integration.json"
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                if "api_key" in config:
+                    return config["api_key"]
+        except Exception as e:
+            st.error(f"读取配置文件时出错: {e}")
+    return "sk-xxxxxxxxxxxxxxxxxxxxxx"  # 默认占位符
+
+def save_api_key(api_key):
+    """保存API密钥到配置文件"""
+    config_path = "config/saas/agent_integration.json"
+    config = {}
+    
+    # 如果文件已存在，读取现有配置
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        except Exception as e:
+            st.error(f"读取现有配置时出错: {e}")
+    
+    # 更新API密钥和生成时间
+    config["api_key"] = api_key
+    config["api_key_generated_at"] = datetime.now().isoformat()
+    
+    # 保存配置
+    os.makedirs("config/saas", exist_ok=True)
+    try:
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        st.error(f"保存API密钥时出错: {e}")
+        return False
+
 def render_api_configuration():
     """渲染API配置界面"""
     st.subheader("API配置与管理")
@@ -51,11 +101,14 @@ def render_api_configuration():
     # API密钥管理
     st.markdown("### 🔑 API密钥管理")
     
+    # 获取当前API密钥
+    api_key = get_current_api_key()
+    
     col1, col2 = st.columns([2, 1])
     with col1:
-        api_key = st.text_input(
+        api_key_display = st.text_input(
             "您的API密钥",
-            value="sk-xxxxxxxxxxxxxxxxxxxxxx",
+            value=api_key,
             type="password",
             disabled=True
         )
@@ -63,9 +116,38 @@ def render_api_configuration():
         st.write("")
         st.write("")
         if st.button("🔄 重新生成", use_container_width=True):
-            st.success("✅ 新的API密钥已生成")
+            # 生成新的API密钥
+            new_api_key = generate_api_key()
+            if save_api_key(new_api_key):
+                # 更新当前显示的API密钥
+                api_key = new_api_key
+                st.success("✅ 新的API密钥已生成")
+                # 使用刷新按钮提示用户
+                st.info("请刷新页面以查看更新后的API密钥")
+            else:
+                st.error("❌ 生成API密钥失败")
         if st.button("📋 复制", use_container_width=True):
+            st.session_state["copied_api_key"] = api_key
             st.info("API密钥已复制到剪贴板")
+    
+    # 显示API密钥有效期信息
+    config_path = "config/saas/agent_integration.json"
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                if "api_key_generated_at" in config:
+                    generated_at = datetime.fromisoformat(config["api_key_generated_at"])
+                    # 假设API密钥有效期为30天
+                    expires_at = generated_at + timedelta(days=30)
+                    days_left = (expires_at - datetime.now()).days
+                    
+                    if days_left > 0:
+                        st.info(f"⚠️ 此API密钥将于 {expires_at.strftime('%Y-%m-%d')} 过期（剩余 {days_left} 天）")
+                    else:
+                        st.warning(f"🚨 此API密钥已过期，请重新生成")
+        except Exception as e:
+            pass
     
     st.markdown("---")
     
@@ -150,7 +232,19 @@ def render_api_configuration():
     
     # 保存配置
     if st.button("💾 保存配置", type="primary", use_container_width=False):
-        config = {
+        # 获取当前配置（保留API密钥信息）
+        config_path = "config/saas/agent_integration.json"
+        config = {}
+        
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+            except Exception as e:
+                st.error(f"读取现有配置时出错: {e}")
+        
+        # 更新配置
+        config.update({
             "services": services,
             "rate_limit": rate_limit,
             "daily_quota": daily_quota,
@@ -158,13 +252,15 @@ def render_api_configuration():
             "webhook_url": webhook_url,
             "enable_notifications": enable_notifications,
             "updated_at": datetime.now().isoformat()
-        }
+        })
         
         os.makedirs("config/saas", exist_ok=True)
         with open("config/saas/agent_integration.json", 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
         
         st.success("✅ 配置已保存！")
+    
+
 
 
 def render_service_monitoring():
@@ -174,53 +270,124 @@ def render_service_monitoring():
     # 实时状态
     st.markdown("### 📈 实时服务状态")
     
+    # 提供输入框让用户填写真实数据
+    with st.expander("🔧 编辑监控数据", expanded=False):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            online_users = st.number_input("当前在线用户", min_value=0, value=128, key="online_users")
+            online_users_delta = st.number_input("变化量", value=15, key="online_users_delta")
+        with col2:
+            active_connections = st.number_input("活跃连接数", min_value=0, value=45, key="active_connections")
+            active_connections_delta = st.number_input("变化量", value=3, key="active_connections_delta")
+        with col3:
+            queued_requests = st.number_input("队列中请求", min_value=0, value=12, key="queued_requests")
+            queued_requests_delta = st.number_input("变化量", value=-8, key="queued_requests_delta")
+    
+    # 显示用户输入的数据
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("当前在线用户", "128", delta="15")
+        st.metric("当前在线用户", online_users, delta=online_users_delta)
     with col2:
-        st.metric("活跃连接数", "45", delta="3")
+        st.metric("活跃连接数", active_connections, delta=active_connections_delta)
     with col3:
-        st.metric("队列中请求", "12", delta="-8")
+        st.metric("队列中请求", queued_requests, delta=queued_requests_delta)
     
     st.markdown("---")
     
     # API调用统计
     st.markdown("### 📊 API调用统计")
     
-    # 生成模拟数据
-    dates = pd.date_range(end=datetime.now(), periods=30, freq='D')
-    api_calls_data = pd.DataFrame({
-        "日期": dates.strftime('%Y-%m-%d'),
-        "智能分析": [100 + i * 5 for i in range(30)],
-        "数据采集": [80 + i * 3 for i in range(30)],
-        "原型测试": [50 + i * 2 for i in range(30)],
-        "异常检测": [40 + i * 1 for i in range(30)]
-    })
+    # 提供选项让用户选择使用模拟数据或真实数据
+    use_real_data = st.checkbox("使用真实数据", value=False)
     
-    st.line_chart(api_calls_data.set_index("日期"))
+    if use_real_data:
+        # 让用户上传CSV文件或手动输入数据
+        uploaded_file = st.file_uploader("上传API调用统计CSV文件", type=["csv"])
+        if uploaded_file is not None:
+            try:
+                api_calls_data = pd.read_csv(uploaded_file)
+                st.success("数据已成功上传")
+                # 显示上传的数据
+                st.dataframe(api_calls_data)
+                # 绘制图表
+                if "日期" in api_calls_data.columns:
+                    st.line_chart(api_calls_data.set_index("日期"))
+            except Exception as e:
+                st.error(f"上传文件出错: {e}")
+    else:
+        # 使用模拟数据
+        dates = pd.date_range(end=datetime.now(), periods=30, freq='D')
+        api_calls_data = pd.DataFrame({
+            "日期": dates.strftime('%Y-%m-%d'),
+            "智能分析": [100 + i * 5 for i in range(30)],
+            "数据采集": [80 + i * 3 for i in range(30)],
+            "原型测试": [50 + i * 2 for i in range(30)],
+            "异常检测": [40 + i * 1 for i in range(30)]
+        })
+        st.line_chart(api_calls_data.set_index("日期"))
     
     st.markdown("---")
     
     # 错误监控
     st.markdown("### ⚠️ 错误监控")
     
+    # 提供选项让用户添加/编辑错误记录
+    with st.expander("🔧 添加/编辑错误记录", expanded=False):
+        num_errors = st.number_input("错误记录数量", min_value=1, max_value=10, value=3)
+        errors = []
+        for i in range(num_errors):
+            st.subheader(f"错误记录 {i+1}")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                time = st.text_input(f"时间 {i+1}", value=f"2025-10-18 {13+i}:{30+i*15%60:02d}", key=f"error_time_{i}")
+            with col2:
+                error_type = st.selectbox(f"类型 {i+1}", ["Rate Limit", "Timeout", "Auth Error", "Server Error", "Client Error"], key=f"error_type_{i}")
+            with col3:
+                api = st.text_input(f"API {i+1}", value=f"/api/v1/{['analyze', 'collect', 'test', 'insights', 'data'][i%5]}", key=f"error_api_{i}")
+            with col4:
+                status = st.selectbox(f"状态 {i+1}", ["已解决", "处理中", "未解决"], key=f"error_status_{i}")
+            errors.append({"时间": time, "类型": error_type, "API": api, "状态": status})
+    
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("#### 最近错误")
-        errors = [
-            {"时间": "2025-10-18 15:30", "类型": "Rate Limit", "API": "/api/v1/analyze", "状态": "已解决"},
-            {"时间": "2025-10-18 14:15", "类型": "Timeout", "API": "/api/v1/collect", "状态": "已解决"},
-            {"时间": "2025-10-18 13:45", "类型": "Auth Error", "API": "/api/v1/test", "状态": "已解决"}
-        ]
         st.dataframe(pd.DataFrame(errors), use_container_width=True, hide_index=True)
     
     with col2:
         st.markdown("#### 错误率趋势")
+        # 允许用户编辑错误率数据
+        # 初始化默认数据
         error_rate = pd.DataFrame({
             "时间": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
             "错误率%": [0.5, 0.3, 0.8, 1.2, 0.6, 0.4]
         })
+        
+        # 允许用户编辑错误率数据
+        with st.expander("编辑错误率数据", expanded=False):
+            error_times = st.text_input("时间点（逗号分隔）", value="00:00,04:00,08:00,12:00,16:00,20:00")
+            error_rates = st.text_input("错误率%（逗号分隔）", value="0.5,0.3,0.8,1.2,0.6,0.4")
+            
+            try:
+                times_list = [t.strip() for t in error_times.split(",")]
+                rates_list = [float(r.strip()) for r in error_rates.split(",")]
+                if len(times_list) == len(rates_list):
+                    error_rate = pd.DataFrame({"时间": times_list, "错误率%": rates_list})
+                else:
+                    st.error("时间点和错误率数量不匹配")
+                    # 使用默认数据
+                    error_rate = pd.DataFrame({
+                        "时间": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+                        "错误率%": [0.5, 0.3, 0.8, 1.2, 0.6, 0.4]
+                    })
+            except Exception as e:
+                st.error(f"数据格式错误: {e}")
+                # 使用默认数据
+                error_rate = pd.DataFrame({
+                    "时间": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+                    "错误率%": [0.5, 0.3, 0.8, 1.2, 0.6, 0.4]
+                })
+        
         st.bar_chart(error_rate.set_index("时间"))
 
 
@@ -258,47 +425,79 @@ def render_intelligent_recommendations():
     
     st.markdown("---")
     
+    # 允许用户添加自定义推荐
+    with st.expander("🔧 管理推荐内容", expanded=False):
+        use_custom_recommendations = st.checkbox("使用自定义推荐", value=False)
+        recommendations = []
+        
+        if use_custom_recommendations:
+            num_recommendations = st.number_input("推荐数量", min_value=1, max_value=20, value=5)
+            
+            for i in range(num_recommendations):
+                st.subheader(f"推荐 {i+1}")
+                rec_type = st.selectbox(
+                    f"类型 {i+1}",
+                    ["产品推荐", "市场机会", "优化建议", "风险预警", "趋势预测"],
+                    key=f"rec_type_{i}"
+                )
+                title = st.text_input(f"标题 {i+1}", value=f"推荐标题 {i+1}", key=f"rec_title_{i}")
+                description = st.text_area(f"描述 {i+1}", value=f"这是推荐内容的详细描述 {i+1}", key=f"rec_desc_{i}")
+                confidence = st.slider(f"置信度 {i+1}", 0.0, 1.0, 0.7 + i*0.03, 0.01, key=f"rec_conf_{i}")
+                priority = st.selectbox(f"优先级 {i+1}", ["高", "中", "低"], key=f"rec_prio_{i}")
+                
+                recommendations.append({
+                    "类型": rec_type,
+                    "标题": title,
+                    "描述": description,
+                    "置信度": confidence,
+                    "优先级": priority
+                })
+        else:
+            # 默认推荐数据
+            recommendations = [
+                {
+                    "类型": "产品推荐",
+                    "标题": "高潜力产品类别",
+                    "描述": "根据市场趋势分析，建议关注'智能家居'类别，预计增长率32%",
+                    "置信度": 0.89,
+                    "优先级": "高"
+                },
+                {
+                    "类型": "市场机会",
+                    "标题": "新兴市场机会",
+                    "描述": "东南亚市场电商增长迅速，建议考虑拓展业务",
+                    "置信度": 0.85,
+                    "优先级": "高"
+                },
+                {
+                    "类型": "优化建议",
+                    "标题": "定价策略优化",
+                    "描述": "分析显示价格区间在$50-$100的产品转化率最高",
+                    "置信度": 0.82,
+                    "优先级": "中"
+                },
+                {
+                    "类型": "风险预警",
+                    "标题": "库存预警",
+                    "描述": "预测下月热门产品可能出现库存不足",
+                    "置信度": 0.78,
+                    "优先级": "中"
+                },
+                {
+                    "类型": "趋势预测",
+                    "标题": "消费趋势变化",
+                    "描述": "环保产品需求预计在未来3个月增长25%",
+                    "置信度": 0.75,
+                    "优先级": "低"
+                }
+            ]
+        
+        # 继续处理推荐数据
+        # 处理推荐数据的后续逻辑
+    
     # 推荐展示区域
     if enable_recommendations:
         st.markdown("### 💡 当前推荐")
-        
-        recommendations = [
-            {
-                "类型": "产品推荐",
-                "标题": "高潜力产品类别",
-                "描述": "根据市场趋势分析，建议关注'智能家居'类别，预计增长率32%",
-                "置信度": 0.89,
-                "优先级": "高"
-            },
-            {
-                "类型": "市场机会",
-                "标题": "新兴市场机会",
-                "描述": "东南亚市场电商增长迅速，建议考虑拓展业务",
-                "置信度": 0.85,
-                "优先级": "高"
-            },
-            {
-                "类型": "优化建议",
-                "标题": "定价策略优化",
-                "描述": "分析显示价格区间在$50-$100的产品转化率最高",
-                "置信度": 0.82,
-                "优先级": "中"
-            },
-            {
-                "类型": "风险预警",
-                "标题": "库存预警",
-                "描述": "预测下月热门产品可能出现库存不足",
-                "置信度": 0.78,
-                "优先级": "中"
-            },
-            {
-                "类型": "趋势预测",
-                "标题": "消费趋势变化",
-                "描述": "环保产品需求预计在未来3个月增长25%",
-                "置信度": 0.75,
-                "优先级": "低"
-            }
-        ]
         
         for idx, rec in enumerate(recommendations[:max_recommendations], 1):
             if rec["置信度"] >= min_confidence and rec["类型"] in recommendation_types:
