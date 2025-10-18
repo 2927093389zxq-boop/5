@@ -22,3 +22,5 @@ python-dateutil
 plotly
 python-multipart
 playwright
+jieba
+wordcloud
