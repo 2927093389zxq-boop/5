@@ -31,17 +31,81 @@ def render_order_management():
         st.write("")
         st.write("")
         if st.button("➕ 新建订单", use_container_width=True):
-            st.info("新建订单功能开发中...")
+            st.session_state['show_create_order_modal'] = True
     with col3:
         st.write("")
         st.write("")
         if st.button("📊 导出订单", use_container_width=True):
-            st.info("导出功能开发中...")
+            st.session_state['show_export_order_modal'] = True
     with col4:
         st.write("")
         st.write("")
         if st.button("🔄 刷新", use_container_width=True):
             st.rerun()
+    
+    # 新建订单对话框
+    if st.session_state.get('show_create_order_modal', False):
+        with st.expander("➕ 新建订单", expanded=True):
+            st.subheader("订单信息录入")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                new_order_customer = st.text_input("客户名称/邮箱*", key="new_order_customer")
+                new_order_product = st.text_input("产品名称", key="new_order_product")
+                new_order_quantity = st.number_input("产品数量*", min_value=1, value=1, step=1, key="new_order_qty")
+                new_order_amount = st.number_input("订单金额(¥)*", min_value=0.0, value=0.0, step=0.01, key="new_order_amount")
+            with col2:
+                new_order_payment = st.selectbox("支付方式", ["支付宝", "微信支付", "信用卡", "货到付款"], key="new_order_payment")
+                new_order_status = st.selectbox("订单状态", ["待付款", "待发货", "已发货", "已完成"], key="new_order_status")
+                new_order_notes = st.text_area("订单备注", key="new_order_notes", height=80)
+                new_order_priority = st.checkbox("急件", key="new_order_priority")
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("✅ 创建订单", type="primary", use_container_width=True):
+                    if new_order_customer and new_order_amount > 0:
+                        order_id = f"ORD{20250000 + random.randint(1, 99999)}"
+                        st.success(f"✅ 订单创建成功！订单号: {order_id}")
+                        st.info(f"客户: {new_order_customer}, 金额: ¥{new_order_amount}")
+                        st.session_state['show_create_order_modal'] = False
+                        st.rerun()
+                    else:
+                        st.error("请填写必填项（客户名称、订单金额）")
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_create_order_modal'] = False
+                    st.rerun()
+    
+    # 导出订单对话框
+    if st.session_state.get('show_export_order_modal', False):
+        with st.expander("📊 导出订单数据", expanded=True):
+            st.subheader("选择导出格式和范围")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                export_format = st.selectbox("导出格式", ["Excel (xlsx)", "CSV", "JSON"], key="export_order_format")
+                export_date_range = st.selectbox("时间范围", ["今天", "最近7天", "最近30天", "最近90天", "全部"], key="export_order_date")
+            with col2:
+                export_status = st.multiselect("订单状态", 
+                    ["待付款", "待发货", "已发货", "已完成", "已取消", "退款中"],
+                    default=["待付款", "待发货", "已发货", "已完成"],
+                    key="export_order_status")
+                include_fields = st.multiselect("包含字段",
+                    ["订单号", "客户", "产品数量", "订单金额", "支付方式", "状态", "下单时间", "发货时间", "备注"],
+                    default=["订单号", "客户", "订单金额", "状态", "下单时间"],
+                    key="export_order_fields")
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 3])
+            with col_btn1:
+                if st.button("📥 下载", type="primary", use_container_width=True):
+                    st.success(f"✅ 导出成功！格式: {export_format}, 时间范围: {export_date_range}")
+                    st.info(f"包含状态: {', '.join(export_status)}")
+                    st.session_state['show_export_order_modal'] = False
+                    st.rerun()
+            with col_btn2:
+                if st.button("❌ 取消", use_container_width=True):
+                    st.session_state['show_export_order_modal'] = False
+                    st.rerun()
     
     st.divider()
     

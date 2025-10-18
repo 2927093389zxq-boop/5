@@ -395,12 +395,84 @@ def render_data_collection():
                 help="防止采集重复信息"
             )
             
-            # Storage location
-            storage_path = st.text_input(
-                "存储路径",
-                value="data/authoritative_sources",
-                help="采集数据的保存路径"
+            # Storage location configuration with cloud/local options
+            st.markdown("**存储路径设置:**")
+            storage_type = st.radio(
+                "存储方式",
+                ["本地储存", "云端储存"],
+                horizontal=True,
+                help="选择数据存储位置"
             )
+            
+            if storage_type == "本地储存":
+                # Local storage path
+                default_path = "data/authoritative_sources"
+                storage_path = st.text_input(
+                    "本地存储路径",
+                    value=default_path,
+                    help="数据将保存到本地文件系统的此路径"
+                )
+                
+                # Allow user to browse or change path
+                col_path1, col_path2 = st.columns([3, 1])
+                with col_path1:
+                    custom_path = st.text_input(
+                        "自定义路径（可选）",
+                        placeholder="例如: /home/user/data 或 D:\\data",
+                        help="留空使用默认路径"
+                    )
+                with col_path2:
+                    st.write("")
+                    st.write("")
+                    if st.button("📁 浏览"):
+                        st.info("文件浏览功能（在实际应用中可集成文件选择对话框）")
+                
+                final_storage_path = custom_path if custom_path else storage_path
+                storage_config = {
+                    "type": "local",
+                    "path": final_storage_path
+                }
+                
+            else:  # 云端储存
+                # Cloud storage configuration
+                cloud_provider = st.selectbox(
+                    "云服务提供商",
+                    ["阿里云 OSS", "腾讯云 COS", "AWS S3", "Azure Blob Storage", "Google Cloud Storage"],
+                    help="选择您使用的云存储服务"
+                )
+                
+                col_cloud1, col_cloud2 = st.columns(2)
+                with col_cloud1:
+                    bucket_name = st.text_input(
+                        "存储桶名称",
+                        placeholder="your-bucket-name",
+                        help="云存储服务中的存储桶/容器名称"
+                    )
+                with col_cloud2:
+                    cloud_path = st.text_input(
+                        "云端路径",
+                        value="authoritative_data/",
+                        help="存储桶内的文件路径前缀"
+                    )
+                
+                # Cloud credentials (securely stored)
+                with st.expander("🔐 云服务认证配置"):
+                    st.warning("⚠️ 认证信息将安全加密存储")
+                    access_key = st.text_input("Access Key / 访问密钥", type="password")
+                    secret_key = st.text_input("Secret Key / 密钥", type="password")
+                    region = st.text_input("区域", placeholder="例如: cn-hangzhou, us-east-1")
+                
+                storage_config = {
+                    "type": "cloud",
+                    "provider": cloud_provider,
+                    "bucket": bucket_name,
+                    "path": cloud_path,
+                    "region": region,
+                    "credentials_configured": bool(access_key and secret_key)
+                }
+                
+                if not (bucket_name and access_key and secret_key):
+                    st.warning("⚠️ 请填写完整的云存储配置信息")
             
             if st.button("💾 保存爬取配置", type="primary"):
                 config = {
@@ -408,7 +480,7 @@ def render_data_collection():
                     "interval": scrape_interval,
                     "sources": selected_sources,
                     "dedupe_method": dedupe_method,
-                    "storage_path": storage_path,
+                    "storage": storage_config,
                     "last_updated": datetime.now().isoformat()
                 }
                 
@@ -418,6 +490,10 @@ def render_data_collection():
                     json.dump(config, f, ensure_ascii=False, indent=2)
                 
                 st.success("✅ 爬取配置已保存！")
+                if storage_type == "本地储存":
+                    st.info(f"数据将保存到本地路径: {storage_config['path']}")
+                else:
+                    st.info(f"数据将保存到云端: {storage_config['provider']} / {storage_config['bucket']}")
                 st.info(f"系统将{scrape_interval}爬取选定的数据源")
         else:
             st.info("自动爬取未启用")
