@@ -14,14 +14,18 @@ class TestUserManager(unittest.TestCase):
     
     def setUp(self):
         """设置测试环境 - 使用临时文件"""
-        self.temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json')
-        self.temp_file.close()
-        self.user_manager = UserManager(data_file=self.temp_file.name)
+        # 使用 mkstemp 更安全的方式创建临时文件
+        fd, self.temp_file_path = tempfile.mkstemp(suffix='.json')
+        os.close(fd)  # 立即关闭文件描述符
+        self.user_manager = UserManager(data_file=self.temp_file_path)
     
     def tearDown(self):
         """清理测试环境"""
-        if os.path.exists(self.temp_file.name):
-            os.unlink(self.temp_file.name)
+        try:
+            if os.path.exists(self.temp_file_path):
+                os.unlink(self.temp_file_path)
+        except Exception:
+            pass  # 静默处理清理错误
     
     def test_add_user(self):
         """测试添加用户"""
@@ -151,12 +155,22 @@ class TestUserManager(unittest.TestCase):
         
         stats = self.user_manager.get_statistics()
         
+        # 测试基本统计
         self.assertEqual(stats['total_users'], 4)
         self.assertEqual(stats['active_users'], 3)
-        self.assertEqual(stats['paid_users'], 2)  # 管理员 + VIP用户
+        
+        # 测试付费用户数（验证逻辑：管理员 + VIP用户）
+        # 使用显式计算而不是硬编码，使测试更加清晰
+        expected_paid = (stats['roles'].get('管理员', 0) + 
+                        stats['roles'].get('VIP用户', 0))
+        self.assertEqual(stats['paid_users'], expected_paid)
+        
+        # 测试角色分布
         self.assertEqual(stats['roles']['管理员'], 1)
         self.assertEqual(stats['roles']['VIP用户'], 1)
         self.assertEqual(stats['roles']['普通用户'], 2)
+        
+        # 测试状态分布
         self.assertEqual(stats['status']['活跃'], 3)
         self.assertEqual(stats['status']['禁用'], 1)
     
@@ -185,7 +199,7 @@ class TestUserManager(unittest.TestCase):
         self.user_manager.add_user("user1", "user1@test.com")
         
         # 创建新的管理器实例，读取相同的文件
-        new_manager = UserManager(data_file=self.temp_file.name)
+        new_manager = UserManager(data_file=self.temp_file_path)
         users = new_manager.get_all_users()
         
         self.assertEqual(len(users), 1)
