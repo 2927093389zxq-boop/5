@@ -307,9 +307,10 @@ class PeriodicScheduler:
             # Get next run time safely
             next_run = None
             try:
-                if hasattr(job, 'next_run_time'):
-                    next_run = job.next_run_time.isoformat() if job.next_run_time else None
-            except:
+                next_run_time = getattr(job, 'next_run_time', None)
+                if next_run_time:
+                    next_run = next_run_time.isoformat()
+            except (AttributeError, TypeError):
                 pass
             
             jobs_list.append({

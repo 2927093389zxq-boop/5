@@ -17,7 +17,10 @@ class TestPeriodicScheduler(unittest.TestCase):
     
     def setUp(self):
         """测试前设置 / Setup before tests"""
-        self.config_file = tempfile.mktemp(suffix='.json')
+        # Use NamedTemporaryFile for security
+        self.config_file_obj = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        self.config_file = self.config_file_obj.name
+        self.config_file_obj.close()
         self.scheduler = PeriodicScheduler(config_file=self.config_file)
         self.test_results = []
     

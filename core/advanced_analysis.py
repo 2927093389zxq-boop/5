@@ -162,7 +162,7 @@ class AdvancedAnalyzer:
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
         
         # 箱线图
-        axes[0].boxplot(prices, vert=True)
+        axes[0].boxplot(prices, orientation='vertical')
         axes[0].set_ylabel('Price ($)')
         axes[0].set_title('Price Distribution - Box Plot')
         axes[0].grid(True, alpha=0.3)
