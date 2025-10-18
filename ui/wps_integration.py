@@ -34,8 +34,26 @@ def render_wps_login(wps: WPSIntegration):
     """渲染WPS登录界面"""
     st.markdown("### 🔐 连接WPS账号")
     
+    # 检查是否配置了API凭证
+    has_credentials = bool(wps.app_id and wps.app_secret)
+    
+    if has_credentials:
+        st.success("✅ WPS API凭证已配置 (使用生产模式)")
+    else:
+        st.warning("⚠️ 未配置WPS API凭证，将使用演示模式")
+        st.info("""
+        **如需使用真实的WPS API：**
+        1. 在 [WPS开放平台](https://open.wps.cn/) 注册并创建应用
+        2. 设置环境变量：
+           ```bash
+           export WPS_APP_ID="your-app-id"
+           export WPS_APP_SECRET="your-app-secret"
+           ```
+        3. 或在下方"API密钥配置"标签页中配置
+        """)
+    
     # 提供两种登录方式的说明
-    tab1, tab2 = st.tabs(["账号密码登录", "API密钥配置"])
+    tab1, tab2, tab3 = st.tabs(["账号密码登录", "OAuth授权", "API密钥配置"])
     
     with tab1:
         st.info("""
@@ -47,7 +65,7 @@ def render_wps_login(wps: WPSIntegration):
         - 👥 与团队成员协作
         - 🔗 生成分享链接
         
-        注意：这是一个演示版本，实际生产环境需要接入WPS官方OAuth认证。
+        注意：密码模式需要WPS API支持，如果不支持会自动使用演示模式。
         """)
         
         with st.form("wps_login_form"):
@@ -72,10 +90,13 @@ def render_wps_login(wps: WPSIntegration):
                     st.error("❌ 请输入账号和密码")
                 else:
                     with st.spinner("正在连接WPS..."):
-                        result = wps.authenticate(username, password)
+                        result = wps.authenticate(username=username, password=password)
                     
                     if result['success']:
-                        st.success(f"✅ {result['message']}")
+                        mode = "演示模式" if result.get('demo_mode') else "生产模式"
+                        st.success(f"✅ {result['message']} ({mode})")
+                        if result.get('demo_mode'):
+                            st.info("💡 当前使用演示模式。如需使用真实API，请配置WPS应用凭证。")
                         st.balloons()
                         st.rerun()
                     else:
@@ -83,18 +104,94 @@ def render_wps_login(wps: WPSIntegration):
     
     with tab2:
         st.info("""
-        **使用WPS开放平台API**
+        **OAuth 2.0 授权登录**
         
-        如果您有WPS开放平台的应用凭证，可以在此配置：
+        推荐的安全登录方式，适用于生产环境：
+        1. 点击下方"生成授权链接"按钮
+        2. 在新窗口完成WPS账号授权
+        3. 复制回调URL中的授权码
+        4. 在下方输入授权码完成登录
+        
+        注意：需要先配置WPS应用凭证才能使用OAuth登录。
+        """)
+        
+        if has_credentials:
+            # 生成OAuth授权链接
+            redirect_uri = st.text_input(
+                "回调地址",
+                value="http://localhost:8501",
+                help="应用的OAuth回调地址"
+            )
+            
+            if st.button("🔗 生成授权链接", use_container_width=True):
+                auth_url = wps.get_auth_url(redirect_uri)
+                if auth_url:
+                    st.markdown(f"### [点击此处进行OAuth授权]({auth_url})")
+                    st.code(auth_url, language=None)
+                    st.info("👆 点击链接或复制到浏览器打开，完成授权后复制回调URL中的code参数")
+                else:
+                    st.error("生成授权链接失败")
+            
+            st.markdown("---")
+            
+            # OAuth授权码登录
+            with st.form("oauth_login_form"):
+                auth_code = st.text_input(
+                    "授权码 (code)",
+                    placeholder="从回调URL中复制的授权码",
+                    help="完成OAuth授权后，从回调URL的code参数中获取"
+                )
+                
+                callback_uri = st.text_input(
+                    "回调地址 (需与上方一致)",
+                    value=redirect_uri,
+                    help="必须与授权链接中的redirect_uri一致"
+                )
+                
+                submitted = st.form_submit_button("✅ 确认授权", use_container_width=True)
+                
+                if submitted:
+                    if not auth_code:
+                        st.error("❌ 请输入授权码")
+                    else:
+                        with st.spinner("正在验证授权..."):
+                            result = wps.authenticate(code=auth_code, redirect_uri=callback_uri)
+                        
+                        if result['success']:
+                            st.success(f"✅ {result['message']}")
+                            st.balloons()
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {result['message']}")
+        else:
+            st.warning("⚠️ 请先配置WPS API凭证才能使用OAuth登录")
+    
+    with tab3:
+        st.info("""
+        **配置WPS开放平台API凭证**
+        
+        获取步骤：
         1. 访问 [WPS开放平台](https://open.wps.cn/)
         2. 注册并创建应用
-        3. 获取 AppID 和 AppSecret
+        3. 获取 App ID 和 App Secret
         4. 在下方填入凭证信息
+        
+        推荐：使用环境变量存储凭证更安全
+        ```bash
+        export WPS_APP_ID="your-app-id"
+        export WPS_APP_SECRET="your-app-secret"
+        ```
         """)
+        
+        # 显示当前凭证状态
+        if has_credentials:
+            st.success(f"✅ App ID: {wps.app_id[:8]}... (已配置)")
+            st.success("✅ App Secret: ******** (已配置)")
         
         with st.form("wps_api_config_form"):
             app_id = st.text_input(
                 "WPS App ID",
+                value=wps.app_id if not has_credentials else "",
                 help="在WPS开放平台获取"
             )
             
@@ -113,12 +210,8 @@ def render_wps_login(wps: WPSIntegration):
                         app_id=app_id,
                         app_secret=app_secret
                     )
-                    st.success("✅ API配置已保存")
-                    
-                    # 显示OAuth认证链接
-                    auth_url = wps.get_auth_url()
-                    if auth_url:
-                        st.markdown(f"[点击此处进行OAuth认证]({auth_url})")
+                    st.success("✅ API配置已保存，请刷新页面重新登录")
+                    st.info("💡 配置已保存到配置文件。建议使用环境变量以提高安全性。")
                 else:
                     st.warning("请填写完整的API凭证")
 
@@ -127,18 +220,42 @@ def render_wps_workspace(wps: WPSIntegration, user_info: dict):
     """渲染WPS工作空间"""
     
     # 顶部用户信息和登出按钮
-    col1, col2 = st.columns([4, 1])
+    col1, col2, col3 = st.columns([3, 2, 1])
     
     with col1:
         user = user_info.get('user', {})
         st.success(f"✅ 已连接WPS账号: **{user.get('username', 'N/A')}**")
     
     with col2:
+        # 显示连接模式
+        is_demo = wps.config.get('demo_mode', True)
+        if is_demo:
+            st.warning("🔧 演示模式")
+        else:
+            st.info("🚀 生产模式")
+    
+    with col3:
         if st.button("🚪 登出", use_container_width=True):
             result = wps.logout()
             if result['success']:
                 st.success(result['message'])
                 st.rerun()
+    
+    # 显示连接状态提示
+    if wps.config.get('demo_mode', True):
+        st.info("""
+        💡 **当前使用演示模式**
+        - 所有操作都是模拟的，不会真实调用WPS API
+        - 数据仅保存在本地配置文件中
+        - 如需使用真实API，请配置WPS应用凭证后重新登录
+        """)
+    else:
+        st.success("""
+        ✅ **已连接到WPS开放平台**
+        - 所有操作将通过真实的WPS API执行
+        - 文档和文件会保存到您的WPS云端账号
+        - 支持与其他WPS用户实时协作
+        """)
     
     st.markdown("---")
     
