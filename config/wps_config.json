@@ -1,7 +1,7 @@
 {
   "username": "test",
   "authenticated": true,
-  "auth_time": "2025-10-18T18:09:49.655283",
+  "auth_time": "2025-10-18T20:35:22.884315",
   "documents": [
     {
       "doc_id": "doc_1760810520.904492",
@@ -11,6 +11,103 @@
       "creator": "demo_user@example.com",
       "url": "https://www.kdocs.cn/l/doc_1760810520.904492",
       "edit_url": "https://www.kdocs.cn/l/doc_1760810520.904492?mode=edit"
+    },
+    {
+      "doc_id": "doc_1760819357.614976",
+      "title": "项目需求文档",
+      "type": "doc",
+      "created_at": "2025-10-18T20:29:17.614978",
+      "creator": "demo@example.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819357.614976",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819357.614976?mode=edit",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760819357.615257",
+      "title": "数据统计表",
+      "type": "sheet",
+      "created_at": "2025-10-18T20:29:17.615261",
+      "creator": "demo@example.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819357.615257",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819357.615257?mode=edit",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760819396.938723",
+      "title": "Test Document",
+      "type": "doc",
+      "created_at": "2025-10-18T20:29:56.938725",
+      "creator": "test@example.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819396.938723",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819396.938723?mode=edit",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760819698.165223",
+      "title": "验证文档",
+      "type": "doc",
+      "created_at": "2025-10-18T20:34:58.165225",
+      "creator": "demo@test.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819698.165223",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819698.165223?mode=edit",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760819722.884636",
+      "title": "验证文档",
+      "type": "doc",
+      "created_at": "2025-10-18T20:35:22.884639",
+      "creator": "demo@test.com",
+      "url": "https://www.kdocs.cn/l/doc_1760819722.884636",
+      "edit_url": "https://www.kdocs.cn/l/doc_1760819722.884636?mode=edit",
+      "demo_mode": true
     }
-  ]
+  ],
+  "demo_mode": true,
+  "shares": [
+    {
+      "doc_id": "doc_1760810520.904492",
+      "users": [
+        "user1@example.com",
+        "user2@example.com"
+      ],
+      "permission": "edit",
+      "shared_at": "2025-10-18T20:29:17.615496",
+      "share_link": "https://www.kdocs.cn/l/doc_1760810520.904492?share=1",
+      "demo_mode": true
+    },
+    {
+      "doc_id": "doc_1760810520.904492",
+      "users": [
+        "user@test.com"
+      ],
+      "permission": "edit",
+      "shared_at": "2025-10-18T20:35:22.885527",
+      "share_link": "https://www.kdocs.cn/l/doc_1760810520.904492?share=1",
+      "demo_mode": true
+    }
+  ],
+  "files": [
+    {
+      "file_id": "file_1760819698.165878",
+      "name": "tmp93p_qqnx.txt",
+      "size": 12,
+      "uploaded_at": "2025-10-18T20:34:58.165883",
+      "uploader": "demo@test.com",
+      "url": "https://www.kdocs.cn/l/file_1760819698.165878",
+      "demo_mode": true
+    },
+    {
+      "file_id": "file_1760819722.885285",
+      "name": "tmpy574mdlo.txt",
+      "size": 12,
+      "uploaded_at": "2025-10-18T20:35:22.885290",
+      "uploader": "demo@test.com",
+      "url": "https://www.kdocs.cn/l/file_1760819722.885285",
+      "demo_mode": true
+    }
+  ],
+  "app_id": "test_app_id",
+  "app_secret": "test_secret",
+  "updated_at": "2025-10-18T20:35:22.885817"
 }

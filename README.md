@@ -5,6 +5,7 @@
 
 ## 核心功能
 - **Amazon 实时爬虫** - 真实Amazon数据采集，支持商品列表和详情页抓取
+- **WPS Office 集成** - 正式接入WPS开放平台，支持在线文档协作 🆕
 - **数据自动记录** - 所有采集数据自动保存到JSON文件，支持多种存储模式
 - **自迭代引擎** - 收集指标 → 发现问题 → 策略组合 → 生成变体 → 沙箱对比评估 → 候选补丁
 - **AI 演化** - 日志分析 + 补丁建议生成
@@ -38,7 +39,16 @@ pip install -r requirements.txt
 ```bash
 OPENAI_API_KEY=sk-xxx                    # OpenAI API密钥(可选)
 MASTER_KEY=your_master_license_sign_key  # 许可证签名密钥(可选)
+
+# WPS Office 集成 (可选 - 用于生产模式)
+WPS_APP_ID=your-wps-app-id              # WPS开放平台应用ID
+WPS_APP_SECRET=your-wps-app-secret      # WPS开放平台应用密钥
 ```
+
+**WPS集成说明：**
+- 不配置凭证时，系统使用演示模式（功能体验但数据仅本地存储）
+- 配置凭证后，系统使用生产模式（真实调用WPS API，数据同步到云端）
+- 详细配置指南请查看：[docs/WPS_INTEGRATION_GUIDE.md](docs/WPS_INTEGRATION_GUIDE.md)
 
 ### 3. 启动系统
 ```bash
